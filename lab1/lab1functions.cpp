@@ -41,24 +41,38 @@ BinaryNumber add(BinaryNumber num1, BinaryNumber num2)
 
 BinaryNumber multiply(BinaryNumber num1, BinaryNumber num2)
 {
-    Array result;
-    if ((num1.getNumber()[0] == 1 && num2.getNumber()[0] == 1) || (num1.getNumber()[0] == 0) && num2.getNumber()[0] == 0) result.push(0);
-    else result.push(1);
-    BinaryNumber* intermediateTerms = new BinaryNumber[31];
-    BinaryNumber zero;
-    zero.setNumber(0);
+    Array num1arr, num2arr, num1arrPos, num2arrPos;
+    num1arr = num1.getNumber();
+    num2arr = num2.getNumber();
+    num1arrPos = num1arr;
+    num1arrPos.shift();
+    num1arrPos.unshift(0);
+    num2arrPos = num2arr;
+    num2arrPos.shift();
+    num2arrPos.unshift(0);
+    BinaryNumber res;
+    res.setNumber(0);
     for (int i = 31; i >= 1; i--)
     {
-        if (num2.getNumber()[i] == 1)
+        Array currterm;
+        if (num2arrPos[i] == 1)
         {
-            intermediateTerms[i].setNumber(num1.getNumber(), num1.getCode());
-            intermediateTerms[i].getNumber().shift();
-            for (int j = 0; j < i; j++) intermediateTerms[i].getNumber().push(0);
+            currterm = num1arrPos;
+            for (int j = 0; j < 31 - i; j++)
+            {
+                currterm.shift();
+                currterm.push(0);
+            }
+            BinaryNumber currtermBin;
+            currtermBin.setNumber(currterm, 0);
+            res = add(res, currtermBin);
         }
-        else intermediateTerms[i] = zero;
     }
-    BinaryNumber res;
-    for (int i = 0; i < 31; i++) res = add(res, intermediateTerms[i]);
+    Array result = res.getNumber();
+    result.shift();
+    if ((num1arr[0] == 1 && num2arr[0] == 1) || (num1arr[0] == 0 && num2arr[0] == 0)) result.unshift(0);
+    else result.unshift(1);
+    res.setNumber(result, 0);
     return res;
 }
 
@@ -85,9 +99,7 @@ BinaryNumber::BinaryNumber()
 }
 BinaryNumber::BinaryNumber(BinaryNumber& copying)
 {
-    Array copied;
-    copied = copying.getNumber();
-    setNumber(copied, copying.code);
+    setNumber(copying.getNumber(), copying.code);
 }
 void BinaryNumber::setNumber(int input)
 {
@@ -98,6 +110,7 @@ void BinaryNumber::setNumber(int input)
 }
 void BinaryNumber::setNumber(Array input, int givenCode)
 {
+    if (number.length > 0) for (int i = 0; i < 32; i++) number.pop();
     for (int i = 0; i < 32; i++) number.push(input[i]);
     if (input[0] == 0) sign = 0;
     else sign = 1;
@@ -154,7 +167,7 @@ BinaryNumber& BinaryNumber::convertToComplementary()
     }
     else return (*this).convertToDirect().convertToComplementary();
 }
-BinaryNumber& BinaryNumber::convertToReverse()
+BinaryNumber& BinaryNumber::convertToInverse()
 {
     if (sign == 0 || code == 2) return *this;
     if (code == 0)
@@ -168,5 +181,5 @@ BinaryNumber& BinaryNumber::convertToReverse()
         code = 2;
         return *this;
     }
-    else return  (*this).convertToDirect().convertToReverse();
+    else return  (*this).convertToDirect().convertToInverse();
 }

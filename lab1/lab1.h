@@ -15,7 +15,7 @@ public:
     Array getNumber();
     BinaryNumber& convertToDirect();
     BinaryNumber& convertToComplementary();
-    BinaryNumber& convertToReverse();
+    BinaryNumber& convertToInverse();
 };
 
 class FloatingPointBinaryNumber
@@ -38,6 +38,5 @@ public:
 Array decimalToDirect32bitBin(int input);
 
 BinaryNumber add(BinaryNumber num1, BinaryNumber num2);
-
 BinaryNumber multiply(BinaryNumber num1, BinaryNumber num2);
 
