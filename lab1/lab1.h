@@ -1,16 +1,4 @@
-class Array
-{
-private:
-    int* array;
-public:
-    int length = 0;
-    Array& push(int arg);
-    int pop();
-    Array& unshift(int arg);
-    int operator[](int index);
-    void reverse();
-    void print();
-};
+#include "array.h"
 
 class BinaryNumber
 {
@@ -19,11 +7,15 @@ private:
     int code;
     int sign;
 public:
+    BinaryNumber();
+    BinaryNumber(BinaryNumber& copying);
     void setNumber(int input);
-    void setCode(int input);
+    void setNumber(Array input, int givenCode);
+    int getCode();
     Array getNumber();
     BinaryNumber& convertToDirect();
     BinaryNumber& convertToComplementary();
+    BinaryNumber& convertToReverse();
 };
 
 class FloatingPointBinaryNumber
@@ -43,7 +35,9 @@ public:
     Array getMantissa();
 };
 
-Array decimalToDirect16bitBin(int input);
+Array decimalToDirect32bitBin(int input);
 
-Array add(BinaryNumber num1, BinaryNumber num2);
+BinaryNumber add(BinaryNumber num1, BinaryNumber num2);
+
+BinaryNumber multiply(BinaryNumber num1, BinaryNumber num2);
 

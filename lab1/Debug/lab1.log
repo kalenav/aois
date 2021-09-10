@@ -1,2 +1,7 @@
-﻿  lab1functions.cpp
-  lab1.vcxproj -> E:\Important\uchoba)\aois\lab1\Debug\lab1.exe
+﻿  array.cpp
+D:\uchoba)\aois\lab1\array.cpp(27,68): error C2678: binary '[': no operator found which takes a left-hand operand of type 'const Array' (or there is no acceptable conversion)
+D:\uchoba)\aois\lab1\array.h(13,9): message : could be 'int Array::operator [](int)'
+D:\uchoba)\aois\lab1\array.cpp(27,68): message : while trying to match the argument list '(const Array, int)'
+  lab1.cpp
+  lab1functions.cpp
+  Generating Code...
