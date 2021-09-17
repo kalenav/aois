@@ -23,18 +23,15 @@ Array& Array::unshift(int arg)
 }
 Array::Array()
 {
-    arr = new int[0];
     length = 0;
 }
 Array::Array(const Array& copying)
 {
-    arr = new int[0];
     length = 0;
     for (int i = 0; i < copying.length; i++) (*this).push(copying.arr[i]);
 }
 void Array::operator=(const Array& copying)
 {
-    arr = new int;
     length = 0;
     for (int i = 0; i < copying.length; i++) (*this).push(copying.arr[i]);
 }

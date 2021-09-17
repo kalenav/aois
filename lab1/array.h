@@ -1,7 +1,7 @@
 class Array
 {
 private:
-    int* arr;
+    int* arr = new int;
 public:
     int length = 0;
     Array& push(int arg);
