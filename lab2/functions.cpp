@@ -160,14 +160,18 @@ string clearParentheses(string input)
 string setNegatingArgumentParentheses(string input)
 {
 	string result;
-	for (int i = 0; i < size(input) - 2; i++)
+	for (int i = 0; i < size(input); i++)
 	{
-		if (input[i] == '!' && input[i + 1] == 'x')
+		if (i < size(input) - 2)
 		{
-			result += "(!x";
-			result.push_back(input[i + 2]);
-			result.push_back(')');
-			i += 3;
+			if (input[i] == '!' && input[i + 1] == 'x')
+			{
+				result += "(!x";
+				result.push_back(input[i + 2]);
+				result.push_back(')');
+				i += 2;
+			}
+			else result.push_back(input[i]);
 		}
 		else result.push_back(input[i]);
 	}

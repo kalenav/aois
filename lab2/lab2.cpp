@@ -102,7 +102,6 @@ int main()
 				printf("Input the function: ");
 				cin >> input;
 				bool x1, x2, x3;
-				input = "!x1||!x2";
 				input = setNegatingArgumentParentheses(input);
 				for (int j = 0; j < 8; j++)
 				{
