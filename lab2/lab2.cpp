@@ -15,7 +15,7 @@ int main()
 	int choice;
 	while (true)
 	{
-		printf("Choose action:\n\n1. V(n1, n2, ...) to FDNF/FCNF\n2. fi(x1, x2, ...) to FDNF/FCNF\n3. Arbitrary to FDNF/FCNF\n4. Exit\n");
+		printf("Choose action:\n\n1. V(n1, n2, ...) to FDNF/FCNF\n2. fi(x1, x2, ...) to FDNF/FCNF\n3. Arbitrary three-argument function to FDNF/FCNF\n4. Exit\n");
 		scanf("%d", &choice);
 		truthTable = new int*;
 		switch (choice)
@@ -55,6 +55,9 @@ int main()
 					if (elementInArr(inputs, j, inputQuantity)) truthTable[argumentsQuantity][j] = 1;
 					else truthTable[argumentsQuantity][j] = 0;
 				}
+				printf("\n");
+				printmatr(truthTable, argumentsQuantity + 1, truthTableWidth);
+				printf("\n");
 				fullNormalForms result = truthTableToFullNormalForms(truthTable, argumentsQuantity, truthTableWidth);
 				cout << "FDNF: " << result.disjunctive << endl;
 				cout << "FCNF: " << result.conjunctive << endl;
@@ -71,13 +74,8 @@ int main()
 					printf("Input a non-negative index: ");
 					scanf("%d", &index);
 				}
-				printf("\nInput the number of arguments: ");
-				scanf("%d", &argumentsQuantity);
-				while (index < 0)
-				{
-					printf("Input a non-negative number: ");
-					scanf("%d", &argumentsQuantity);
-				}
+				argumentsQuantity = 0;
+				while (index > pow(2, pow(2, argumentsQuantity))) argumentsQuantity++;
 				printf("\nConvert f%d(", index);
 				for (int i = 0; i < argumentsQuantity; i++)
 				{
@@ -89,6 +87,9 @@ int main()
 				allocMemoryAndFillTruthTableArguments(&truthTable, argumentsQuantity, truthTableWidth);
 				int* functionValues = decimalToBinary(index, truthTableWidth);
 				for (int j = 0; j < truthTableWidth; j++) truthTable[argumentsQuantity][j] = functionValues[j];
+				printf("\n");
+				printmatr(truthTable, argumentsQuantity + 1, truthTableWidth);
+				printf("\n");
 				fullNormalForms result = truthTableToFullNormalForms(truthTable, argumentsQuantity, truthTableWidth);
 				cout << "FDNF: " << result.disjunctive << endl;
 				cout << "FCNF: " << result.conjunctive << endl;
@@ -103,7 +104,7 @@ int main()
 				string input;
 				printf("\nAvailable operators: '&&', '||' , '!'; parentheses are allowed and welcome\n");
 				printf("Please use exactly three arguments; denote them by x1, x2, x3 (you can use the arguments multiple times)\n");
-				printf("Chaining operators (e.g. x1||x2||x3) is supported\n");
+				printf("Chaining operators (e.g. x1||x2||x3) is supported, although such inputs will be evaluated in order, not in priority\n");
 				printf("And please refrain from using spaces!\n");
 				printf("Input the function: ");
 				cin >> input;
@@ -120,7 +121,9 @@ int main()
 					if (threeArgumentLogicalFunctionParser(input, x1, x2, x3)) truthTable[3][j] = 1;
 					else truthTable[3][j] = 0;
 				}
+				printf("\n");
 				printmatr(truthTable, argumentsQuantity + 1, truthTableWidth);
+				printf("\n");
 				fullNormalForms result = truthTableToFullNormalForms(truthTable, argumentsQuantity, truthTableWidth);
 				cout << "FDNF: " << result.disjunctive << endl;
 				cout << "FCNF: " << result.conjunctive << endl;
