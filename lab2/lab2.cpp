@@ -55,7 +55,10 @@ int main()
 					if (elementInArr(inputs, j, inputQuantity)) truthTable[argumentsQuantity][j] = 1;
 					else truthTable[argumentsQuantity][j] = 0;
 				}
-				truthTableToFullNormalForms(truthTable, argumentsQuantity, truthTableWidth);
+				fullNormalForms result = truthTableToFullNormalForms(truthTable, argumentsQuantity, truthTableWidth);
+				cout << "FDNF: " << result.disjunctive << endl;
+				cout << "FCNF: " << result.conjunctive << endl;
+				printf("\n");
 				break;
 			}
 			case 2:
@@ -86,7 +89,10 @@ int main()
 				allocMemoryAndFillTruthTableArguments(&truthTable, argumentsQuantity, truthTableWidth);
 				int* functionValues = decimalToBinary(index, truthTableWidth);
 				for (int j = 0; j < truthTableWidth; j++) truthTable[argumentsQuantity][j] = functionValues[j];
-				truthTableToFullNormalForms(truthTable, argumentsQuantity, truthTableWidth);
+				fullNormalForms result = truthTableToFullNormalForms(truthTable, argumentsQuantity, truthTableWidth);
+				cout << "FDNF: " << result.disjunctive << endl;
+				cout << "FCNF: " << result.conjunctive << endl;
+				printf("\n");
 				break;
 			}
 			case 3:
@@ -115,7 +121,10 @@ int main()
 					else truthTable[3][j] = 0;
 				}
 				printmatr(truthTable, argumentsQuantity + 1, truthTableWidth);
-				truthTableToFullNormalForms(truthTable, argumentsQuantity, truthTableWidth);
+				fullNormalForms result = truthTableToFullNormalForms(truthTable, argumentsQuantity, truthTableWidth);
+				cout << "FDNF: " << result.disjunctive << endl;
+				cout << "FCNF: " << result.conjunctive << endl;
+				printf("\n");
 				break;
 			}
 			default:

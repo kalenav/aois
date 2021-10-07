@@ -45,41 +45,45 @@ void allocMemoryAndFillTruthTableArguments(int*** truthTable, int argumentsQuant
 	}
 }
 
-void truthTableToFullNormalForms(int** truthTable, int argumentsQuantity, int truthTableWidth) // prints FDNF and FCNF forms of a function from its truth table
+fullNormalForms truthTableToFullNormalForms(int** truthTable, int argumentsQuantity, int truthTableWidth) // prints FDNF and FCNF forms of a function from its truth table
 {
-	printf("\nFDNF: ");
+	string disjunctive, conjunctive;
 	bool firstIteration = true; // needed to print the pluses between the terms correctly
 	for (int j = 0; j < truthTableWidth; j++)
 	{
 		if (truthTable[argumentsQuantity][j] != 1) continue; // we only need to account for sets of variables that a function yields 0 from
 		if (firstIteration) firstIteration = false;
-		else printf(" + ");
-		printf("(");
+		else disjunctive += " + ";
+		disjunctive.push_back('(');
 		for (int i = 0; i < argumentsQuantity; i++)
 		{
-			if (truthTable[i][j] == 0) printf("!"); // the variable is negated if its value in the current set is 0
-			printf("x%d", i + 1);
-			if (i != argumentsQuantity - 1) printf(" * ");  // print a multiplication sign if the cycle is not on its last iteration
+			if (truthTable[i][j] == 0) disjunctive.push_back('!'); // the variable is negated if its value in the current set is 0
+			disjunctive.push_back('x');
+			disjunctive += to_string(i);
+			if (i != argumentsQuantity - 1) disjunctive += " * ";  // print a multiplication sign if the cycle is not on its last iteration
 		}
-		printf(")");
+		disjunctive.push_back(')');
 	}
-	printf("\nFCNF: ");
 	firstIteration = true;
 	for (int j = 0; j < truthTableWidth; j++)
 	{
 		if (truthTable[argumentsQuantity][j] != 0) continue; // we only need to account for sets of variables that a function yields 1 from
 		if (firstIteration) firstIteration = false;
-		else printf(" * ");
-		printf("(");
+		else conjunctive += " * ";
+		conjunctive.push_back('(');
 		for (int i = 0; i < argumentsQuantity; i++)
 		{
-			if (truthTable[i][j] == 1) printf("!"); // the variable is negated if its value in the current set is 1
-			printf("x%d", i + 1);
-			if (i != argumentsQuantity - 1) printf(" + "); // print an addition sign if the cycle is not on its last iteration
+			if (truthTable[i][j] == 1) conjunctive.push_back('!'); // the variable is negated if its value in the current set is 1
+			conjunctive.push_back('x');
+			conjunctive += to_string(i);
+			if (i != argumentsQuantity - 1) conjunctive += " + "; // print an addition sign if the cycle is not on its last iteration
 		}
-		printf(")");
+		conjunctive.push_back(')');
 	}
-	printf("\n\n");
+	fullNormalForms result;
+	result.disjunctive = disjunctive;
+	result.conjunctive = conjunctive;
+	return result;
 }
 
 void printmatr(int** matr, int height, int width) // just for debug purposes
