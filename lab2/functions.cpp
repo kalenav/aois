@@ -45,6 +45,37 @@ void allocMemoryAndFillTruthTableArguments(int*** truthTable, int argumentsQuant
 	}
 }
 
+int** numericFormToTruthTable(int* inputs, int inputQuantity)
+{
+	int requiredBits = 1; // will store the required number of bits to store the largest input
+	for (int i = 0; i < inputQuantity; i++)
+	{
+		while (inputs[i] > pow(2, requiredBits) - 1) requiredBits++; // we can store numbers up to 2^n - 1 with n binary digits
+	}
+	int argumentsQuantity = requiredBits;
+	int truthTableWidth = pow(2, requiredBits);
+	int** truthTable;
+	allocMemoryAndFillTruthTableArguments(&truthTable, argumentsQuantity, truthTableWidth);
+	for (int j = 0; j < truthTableWidth; j++)
+	{
+		if (elementInArr(inputs, j, inputQuantity)) truthTable[argumentsQuantity][j] = 1;
+		else truthTable[argumentsQuantity][j] = 0;
+	}
+	return truthTable;
+}
+
+int** indexFormToTruthTable(int input)
+{
+	int argumentsQuantity = 0;
+	while (input > pow(2, pow(2, argumentsQuantity)) - 1) argumentsQuantity++; // for n arguments, there is 2^n possible function outputs; 2^n bits can store numbers up to 2^(2^n) - 1, so we increase n until we get enough bits
+	int truthTableWidth = pow(2, argumentsQuantity);
+	int** truthTable;
+	allocMemoryAndFillTruthTableArguments(&truthTable, argumentsQuantity, truthTableWidth);
+	int* functionValues = decimalToBinary(input, truthTableWidth);
+	for (int j = 0; j < truthTableWidth; j++) truthTable[argumentsQuantity][j] = functionValues[j];
+	return truthTable;
+}
+
 fullNormalForms truthTableToFullNormalForms(int** truthTable, int argumentsQuantity, int truthTableWidth) // prints FDNF and FCNF forms of a function from its truth table
 {
 	string disjunctive, conjunctive;
@@ -59,7 +90,7 @@ fullNormalForms truthTableToFullNormalForms(int** truthTable, int argumentsQuant
 		{
 			if (truthTable[i][j] == 0) disjunctive.push_back('!'); // the variable is negated if its value in the current set is 0
 			disjunctive.push_back('x');
-			disjunctive += to_string(i);
+			disjunctive += to_string(i + 1);
 			if (i != argumentsQuantity - 1) disjunctive += " * ";  // print a multiplication sign if the cycle is not on its last iteration
 		}
 		disjunctive.push_back(')');
@@ -75,7 +106,7 @@ fullNormalForms truthTableToFullNormalForms(int** truthTable, int argumentsQuant
 		{
 			if (truthTable[i][j] == 1) conjunctive.push_back('!'); // the variable is negated if its value in the current set is 1
 			conjunctive.push_back('x');
-			conjunctive += to_string(i);
+			conjunctive += to_string(i + 1);
 			if (i != argumentsQuantity - 1) conjunctive += " + "; // print an addition sign if the cycle is not on its last iteration
 		}
 		conjunctive.push_back(')');

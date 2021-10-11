@@ -22,7 +22,6 @@ int main()
 		{
 			case 1:
 			{
-				int requiredBits = 0; // will store the required number of bits to store the largest input
 				int currentInput = -1;
 				int inputQuantity = 0;
 				int* inputs = new int[0];
@@ -31,9 +30,7 @@ int main()
 				{
 					scanf("%d", &currentInput);
 					if (currentInput < 0) break;
-					if (inputQuantity == 0) requiredBits = 1; // needed to account for cases when the only inputs are either 1 or 0
 					push(&inputs, currentInput, inputQuantity++);
-					while (currentInput > pow(2, requiredBits)) requiredBits++;
 				} 				
 				if (inputQuantity == 0)
 				{
@@ -47,17 +44,16 @@ int main()
 					if (i != inputQuantity - 1) printf(", ");
 				}
 				printf(") to FDNF and FCNF\n");
-				argumentsQuantity = requiredBits;
-				truthTableWidth = pow(2, argumentsQuantity);
-				allocMemoryAndFillTruthTableArguments(&truthTable, argumentsQuantity, truthTableWidth);
-				for (int j = 0; j < truthTableWidth; j++)
+				truthTable = numericFormToTruthTable(inputs, inputQuantity);
+				argumentsQuantity = 1;
+				for (int i = 0; i < inputQuantity; i++)
 				{
-					if (elementInArr(inputs, j, inputQuantity)) truthTable[argumentsQuantity][j] = 1;
-					else truthTable[argumentsQuantity][j] = 0;
+					while (inputs[i] > pow(2, argumentsQuantity) - 1)
+					{
+						argumentsQuantity++;
+					}
 				}
-				printf("\n");
-				printmatr(truthTable, argumentsQuantity + 1, truthTableWidth);
-				printf("\n");
+				truthTableWidth = pow(2, argumentsQuantity);
 				fullNormalForms result = truthTableToFullNormalForms(truthTable, argumentsQuantity, truthTableWidth);
 				cout << "FDNF: " << result.disjunctive << endl;
 				cout << "FCNF: " << result.conjunctive << endl;
@@ -74,22 +70,17 @@ int main()
 					printf("Input a non-negative index: ");
 					scanf("%d", &index);
 				}
+				truthTable = indexFormToTruthTable(index);
 				argumentsQuantity = 0;
-				while (index > pow(2, pow(2, argumentsQuantity))) argumentsQuantity++;
+				while (index > pow(2, pow(2, argumentsQuantity)) - 1) argumentsQuantity++;
+				truthTableWidth = pow(2, argumentsQuantity);
 				printf("\nConvert f%d(", index);
 				for (int i = 0; i < argumentsQuantity; i++)
 				{
-					printf("x%d", i+1);
+					printf("x%d", i + 1);
 					if (i != argumentsQuantity - 1) printf(", ");
 				}
 				printf(") to FDNF and FCNF\n");
-				truthTableWidth = pow(2, argumentsQuantity);
-				allocMemoryAndFillTruthTableArguments(&truthTable, argumentsQuantity, truthTableWidth);
-				int* functionValues = decimalToBinary(index, truthTableWidth);
-				for (int j = 0; j < truthTableWidth; j++) truthTable[argumentsQuantity][j] = functionValues[j];
-				printf("\n");
-				printmatr(truthTable, argumentsQuantity + 1, truthTableWidth);
-				printf("\n");
 				fullNormalForms result = truthTableToFullNormalForms(truthTable, argumentsQuantity, truthTableWidth);
 				cout << "FDNF: " << result.disjunctive << endl;
 				cout << "FCNF: " << result.conjunctive << endl;

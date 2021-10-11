@@ -16,6 +16,10 @@ bool elementInArr(int* arr, int elem, int length);
 
 void allocMemoryAndFillTruthTableArguments(int*** truthTable, int argumentsQuantity, int truthTableWidth);
 
+int** numericFormToTruthTable(int* inputs, int inputQuantity);
+
+int** indexFormToTruthTable(int input);
+
 fullNormalForms truthTableToFullNormalForms(int** truthTable, int argumentsQuantity, int truthTableWidth);
 
 void printmatr(int** matr, int i, int j);
