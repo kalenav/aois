@@ -80,12 +80,12 @@ int** indexFormToTruthTable(int input)
 fullNormalForms truthTableToFullNormalForms(int** truthTable, int argumentsQuantity, int truthTableWidth) // prints FDNF and FCNF forms of a function from its truth table
 {
 	string disjunctive, conjunctive;
-	int disjunctiveArgumentsNumber = 0, conjunctiveArgumentsNumber = 0;
+	int disjunctiveConstituentNumber = 0, conjunctiveConstituentNumber = 0;
 	bool firstIteration = true; // needed to print the pluses between the terms correctly
 	for (int j = 0; j < truthTableWidth; j++)
 	{
-		if (truthTable[argumentsQuantity][j] != 1) continue; // we only need to account for sets of variables that a function yields 0 from
-		disjunctiveArgumentsNumber++;
+		if (truthTable[argumentsQuantity][j] != 1) continue; // we only need to account for sets of variables that a function yields 1 from
+		disjunctiveConstituentNumber++;
 		if (firstIteration) firstIteration = false;
 		else disjunctive += " + ";
 		disjunctive.push_back('(');
@@ -101,8 +101,8 @@ fullNormalForms truthTableToFullNormalForms(int** truthTable, int argumentsQuant
 	firstIteration = true;
 	for (int j = 0; j < truthTableWidth; j++)
 	{
-		if (truthTable[argumentsQuantity][j] != 0) continue; // we only need to account for sets of variables that a function yields 1 from
-		conjunctiveArgumentsNumber++;
+		if (truthTable[argumentsQuantity][j] != 0) continue; // we only need to account for sets of variables that a function yields 0 from
+		conjunctiveConstituentNumber++;
 		if (firstIteration) firstIteration = false;
 		else conjunctive += " * ";
 		conjunctive.push_back('(');
@@ -116,16 +116,16 @@ fullNormalForms truthTableToFullNormalForms(int** truthTable, int argumentsQuant
 		conjunctive.push_back(')');
 	}
 	fullNormalForms result;
-	if (disjunctiveArgumentsNumber == 0)
-	{
-		result.disjunctive = "1";
-		result.conjunctive = "1";
-		return result;
-	}
-	if (conjunctiveArgumentsNumber == 0)
+	if (disjunctiveConstituentNumber == 0) // meaning that the function doesn't ever return 1, that is, it's the constant function 0
 	{
 		result.disjunctive = "0";
 		result.conjunctive = "0";
+		return result;
+	}
+	if (conjunctiveConstituentNumber == 0) // meaning that the function doesn't ever return 0, that is, it's the constant function 1
+	{
+		result.disjunctive = "1";
+		result.conjunctive = "1";
 		return result;
 	}
 	result.disjunctive = disjunctive;

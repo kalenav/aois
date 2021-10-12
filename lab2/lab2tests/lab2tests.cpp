@@ -72,7 +72,7 @@ namespace lab2tests
 			allocMemoryAndFillTruthTableArguments(&actual, 5, 32);
 			for (int i = 0; i < 5; i++) for (int j = 0; j < 32; j++) Assert::AreEqual(expected[i][j], actual[i][j]);
 		}
-		TEST_METHOD(numeric1)
+		TEST_METHOD(numericToTruthTable1)
 		{
 			int expected[4][8] =
 			{
@@ -89,7 +89,7 @@ namespace lab2tests
 			actual = numericFormToTruthTable(inputs, 3);
 			for (int i = 0; i < 4; i++) for (int j = 0; j < 8; j++) Assert::AreEqual(expected[i][j], actual[i][j]);
 		}
-		TEST_METHOD(numeric2)
+		TEST_METHOD(numericToTruthTable2)
 		{
 			int expected[6][32] =
 			{
@@ -118,7 +118,7 @@ namespace lab2tests
 			actual = numericFormToTruthTable(inputs, 13);
 			for (int i = 0; i < 6; i++) for (int j = 0; j < 32; j++) Assert::AreEqual(expected[i][j], actual[i][j]);
 		}
-		TEST_METHOD(index1)
+		TEST_METHOD(indexToTruthTable1)
 		{
 			int expected[3][4] =
 			{
@@ -129,7 +129,7 @@ namespace lab2tests
 			int** actual = indexFormToTruthTable(9);
 			for (int i = 0; i < 3; i++) for (int j = 0; j < 4; j++) Assert::AreEqual(expected[i][j], actual[i][j]);
 		}
-		TEST_METHOD(index2)
+		TEST_METHOD(indexToTruthTable2)
 		{
 			int expected[4][8] =
 			{
@@ -141,7 +141,7 @@ namespace lab2tests
 			int** actual = indexFormToTruthTable(38);
 			for (int i = 0; i < 4; i++) for (int j = 0; j < 8; j++) Assert::AreEqual(expected[i][j], actual[i][j]);
 		}
-		TEST_METHOD(index3)
+		TEST_METHOD(indexToTruthTable3)
 		{
 			int expected[6][32] =
 			{
@@ -158,32 +158,132 @@ namespace lab2tests
 		TEST_METHOD(truthTableToFNF1)
 		{
 			fullNormalForms expected;
-			expected.disjunctive = "";
-			expected.conjunctive = "";
+			expected.disjunctive = "(x1 * !x2) + (x1 * x2)";
+			expected.conjunctive = "(x1 + x2) * (x1 + !x2)";
+			int truthTableConst[3][4] =
+			{
+				{ 0, 0, 1, 1 },
+				{ 0, 1, 0, 1 },
+				{ 0, 0, 1, 1 }
+			};
+			int** truthTable = new int* [3];
+			for (int i = 0; i < 3; i++)
+			{
+				truthTable[i] = new int[4];
+				for (int j = 0; j < 4; j++) truthTable[i][j] = truthTableConst[i][j];
+			}
+			fullNormalForms actual = truthTableToFullNormalForms(truthTable, 2, 4);
+			Assert::AreEqual(expected.disjunctive, actual.disjunctive);
+			Assert::AreEqual(expected.conjunctive, actual.conjunctive);
 		}
 		TEST_METHOD(truthTableToFNF2)
 		{
 			fullNormalForms expected;
-			expected.disjunctive = "";
-			expected.conjunctive = "";
+			expected.disjunctive = "(!x1 * !x2) + (!x1 * x2) + (x1 * !x2)";
+			expected.conjunctive = "(!x1 + !x2)";
+			int truthTableConst[3][4] =
+			{
+				{ 0, 0, 1, 1 },
+				{ 0, 1, 0, 1 },
+				{ 1, 1, 1, 0 }
+			};
+			int** truthTable = new int* [3];
+			for (int i = 0; i < 3; i++)
+			{
+				truthTable[i] = new int[4];
+				for (int j = 0; j < 4; j++) truthTable[i][j] = truthTableConst[i][j];
+			}
+			fullNormalForms actual = truthTableToFullNormalForms(truthTable, 2, 4);
+			Assert::AreEqual(expected.disjunctive, actual.disjunctive);
+			Assert::AreEqual(expected.conjunctive, actual.conjunctive);
 		}
 		TEST_METHOD(truthTableToFNF3)
 		{
 			fullNormalForms expected;
-			expected.disjunctive = "";
-			expected.conjunctive = "";
+			expected.disjunctive = "(!x1 * !x2 * !x3) + (!x1 * !x2 * x3) + (!x1 * x2 * !x3) + (x1 * !x2 * !x3) + (x1 * !x2 * x3)";
+			expected.conjunctive = "(x1 + !x2 + !x3) * (!x1 + !x2 + x3) * (!x1 + !x2 + !x3)";
+			int truthTableConst[4][8] =
+			{
+				{ 0, 0, 0, 0, 1, 1, 1, 1 },
+				{ 0, 0, 1, 1, 0, 0, 1, 1 },
+				{ 0, 1, 0, 1, 0, 1, 0, 1 },
+				{ 1, 1, 1, 0, 1, 1, 0, 0 }
+			};
+			int** truthTable = new int* [4];
+			for (int i = 0; i < 4; i++)
+			{
+				truthTable[i] = new int[8];
+				for (int j = 0; j < 8; j++) truthTable[i][j] = truthTableConst[i][j];
+			}
+			fullNormalForms actual = truthTableToFullNormalForms(truthTable, 3, 8);
+			Assert::AreEqual(expected.disjunctive, actual.disjunctive);
+			Assert::AreEqual(expected.conjunctive, actual.conjunctive);
 		}
 		TEST_METHOD(truthTableToFNF4)
 		{
 			fullNormalForms expected;
-			expected.disjunctive = "";
-			expected.conjunctive = "";
+			expected.disjunctive = "(!x1 * !x2 * !x3 * !x4 * x5) + (!x1 * !x2 * !x3 * x4 * !x5) + (!x1 * !x2 * x3 * !x4 * !x5) + (!x1 * !x2 * x3 * x4 * x5) + (!x1 * x2 * !x3 * !x4 * !x5) + (!x1 * x2 * !x3 * !x4 * x5) + (!x1 * x2 * x3 * !x4 * x5) + (!x1 * x2 * x3 * x4 * x5) + (x1 * !x2 * !x3 * !x4 * x5) + (x1 * !x2 * x3 * !x4 * !x5) + (x1 * !x2 * x3 * !x4 * x5) + (x1 * !x2 * x3 * x4 * x5) + (x1 * x2 * !x3 * x4 * !x5) + (x1 * x2 * !x3 * x4 * x5)";
+			expected.conjunctive = "(x1 + x2 + x3 + x4 + x5) * (x1 + x2 + x3 + !x4 + !x5) * (x1 + x2 + !x3 + x4 + !x5) * (x1 + x2 + !x3 + !x4 + x5) * (x1 + !x2 + x3 + !x4 + x5) * (x1 + !x2 + x3 + !x4 + !x5) * (x1 + !x2 + !x3 + x4 + x5) * (x1 + !x2 + !x3 + !x4 + x5) * (!x1 + x2 + x3 + x4 + x5) * (!x1 + x2 + x3 + !x4 + x5) * (!x1 + x2 + x3 + !x4 + !x5) * (!x1 + x2 + !x3 + !x4 + x5) * (!x1 + !x2 + x3 + x4 + x5) * (!x1 + !x2 + x3 + x4 + !x5) * (!x1 + !x2 + !x3 + x4 + x5) * (!x1 + !x2 + !x3 + x4 + !x5) * (!x1 + !x2 + !x3 + !x4 + x5) * (!x1 + !x2 + !x3 + !x4 + !x5)";
+			int truthTableConst[6][32] =
+			{
+				{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+				{ 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1 },
+				{ 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1 },
+				{ 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1 },
+				{ 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1 },
+				{ 0, 1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0 }
+			};
+			int** truthTable = new int* [6];
+			for (int i = 0; i < 6; i++)
+			{
+				truthTable[i] = new int[32];
+				for (int j = 0; j < 32; j++) truthTable[i][j] = truthTableConst[i][j];
+			}
+			fullNormalForms actual = truthTableToFullNormalForms(truthTable, 5, 32);
+			Assert::AreEqual(expected.disjunctive, actual.disjunctive);
+			Assert::AreEqual(expected.conjunctive, actual.conjunctive);
 		}
 		TEST_METHOD(truthTableToFNF5)
 		{
 			fullNormalForms expected;
-			expected.disjunctive = "";
-			expected.conjunctive = "";
+			expected.disjunctive = "0";
+			expected.conjunctive = "0";
+			int** truthTable = new int* [2];
+			truthTable[0] = new int[2];
+			truthTable[1] = new int[2];
+			truthTable[0][0] = 0;
+			truthTable[0][1] = 1;
+			truthTable[1][0] = 0;
+			truthTable[1][1] = 0;
+			fullNormalForms actual = truthTableToFullNormalForms(truthTable, 1, 2);
+			Assert::AreEqual(expected.disjunctive, actual.disjunctive);
+			Assert::AreEqual(expected.conjunctive, actual.conjunctive);
+		}
+		TEST_METHOD(truthTableToFNF6)
+		{
+			fullNormalForms expected;
+			expected.disjunctive = "1";
+			expected.conjunctive = "1";
+			int truthTableConst[8][128]
+			{
+				{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+				{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+				{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+				{ 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1 },
+				{ 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1 },
+				{ 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1 },
+				{ 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1 },
+				{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
+			};
+			int** truthTable = new int* [8];
+			for (int i = 0; i < 8; i++)
+			{
+				truthTable[i] = new int[128];
+				for (int j = 0; j < 128; j++) truthTable[i][j] = truthTableConst[i][j];
+			}
+			fullNormalForms actual = truthTableToFullNormalForms(truthTable, 7, 128);
+			Assert::AreEqual(expected.disjunctive, actual.disjunctive);
+			Assert::AreEqual(expected.conjunctive, actual.conjunctive);
 		}
 	};
 }
