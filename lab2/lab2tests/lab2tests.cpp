@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "CppUnitTest.h"
-#include "../Header.h"
+#include "../lab2header.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -154,6 +154,45 @@ namespace lab2tests
 			};
 			int** actual = indexFormToTruthTable(164454681);
 			for (int i = 0; i < 6; i++) for (int j = 0; j < 32; j++) Assert::AreEqual(expected[i][j], actual[i][j]);
+		}
+		TEST_METHOD(arbitraryToTruthTable1)
+		{
+			int expected[4][8] =
+			{
+				{ 0, 0, 0, 0, 1, 1, 1, 1 },
+				{ 0, 0, 1, 1, 0, 0, 1, 1 },
+				{ 0, 1, 0, 1, 0, 1, 0, 1 },
+				{ 0, 1, 0, 1, 0, 0, 1, 1 }
+			};
+			string input = "!((!x1||!x2)&&!(!x1&&x3))";
+			int** actual = arbitraryToTruthTable(input);
+			for (int i = 0; i < 4; i++) for (int j = 0; j < 8; j++) Assert::AreEqual(expected[i][j], actual[i][j]);
+		}
+		TEST_METHOD(arbitraryToTruthTable2)
+		{
+			int expected[4][8] =
+			{
+				{ 0, 0, 0, 0, 1, 1, 1, 1 },
+				{ 0, 0, 1, 1, 0, 0, 1, 1 },
+				{ 0, 1, 0, 1, 0, 1, 0, 1 },
+				{ 1, 0, 1, 0, 1, 1, 0, 0 }
+			};
+			string input = "!((!x1||x2)&&!(!x1&&!x3))";
+			int** actual = arbitraryToTruthTable(input);
+			for (int i = 0; i < 4; i++) for (int j = 0; j < 8; j++) Assert::AreEqual(expected[i][j], actual[i][j]);
+		}
+		TEST_METHOD(arbitraryToTruthTable3)
+		{
+			int expected[4][8] =
+			{
+				{ 0, 0, 0, 0, 1, 1, 1, 1 },
+				{ 0, 0, 1, 1, 0, 0, 1, 1 },
+				{ 0, 1, 0, 1, 0, 1, 0, 1 },
+				{ 1, 1, 0, 0, 0, 1, 0, 1 }
+			};
+			string input = "!((x1||x2)&&!(x1&&x3))";
+			int** actual = arbitraryToTruthTable(input);
+			for (int i = 0; i < 4; i++) for (int j = 0; j < 8; j++) Assert::AreEqual(expected[i][j], actual[i][j]);
 		}
 		TEST_METHOD(truthTableToFNF1)
 		{

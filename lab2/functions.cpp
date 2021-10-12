@@ -1,5 +1,5 @@
 #include <iostream>
-#include "Header.h"
+#include "lab2header.h"
 #include "math.h"
 #include "lab2tests/pch.h"
 #include <string>
@@ -74,6 +74,26 @@ int** indexFormToTruthTable(int input)
 	allocMemoryAndFillTruthTableArguments(&truthTable, argumentsQuantity, truthTableWidth);
 	int* functionValues = decimalToBinary(input, truthTableWidth);
 	for (int j = 0; j < truthTableWidth; j++) truthTable[argumentsQuantity][j] = functionValues[j];
+	return truthTable;
+}
+
+int** arbitraryToTruthTable(string input)
+{
+	int** truthTable;
+	allocMemoryAndFillTruthTableArguments(&truthTable, 3, 8);
+	bool x1, x2, x3;
+	input = setNegatingArgumentParentheses(input);
+	for (int j = 0; j < 8; j++)
+	{
+		if (truthTable[0][j] == 1) x1 = true;
+		else x1 = false;
+		if (truthTable[1][j] == 1) x2 = true;
+		else x2 = false;
+		if (truthTable[2][j] == 1) x3 = true;
+		else x3 = false;
+		if (threeArgumentLogicalFunctionParser(input, x1, x2, x3)) truthTable[3][j] = 1;
+		else truthTable[3][j] = 0;
+	}
 	return truthTable;
 }
 

@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include "math.h"
-#include "Header.h"
+#include "lab2header.h"
 #include <string>
 
 using namespace std;
@@ -99,22 +99,8 @@ int main()
 				printf("And please refrain from using spaces!\n");
 				printf("Input the function: ");
 				cin >> input;
-				bool x1, x2, x3;
-				input = setNegatingArgumentParentheses(input);
-				for (int j = 0; j < 8; j++)
-				{
-					if (truthTable[0][j] == 1) x1 = true;
-					else x1 = false;
-					if (truthTable[1][j] == 1) x2 = true;
-					else x2 = false;
-					if (truthTable[2][j] == 1) x3 = true;
-					else x3 = false;
-					if (threeArgumentLogicalFunctionParser(input, x1, x2, x3)) truthTable[3][j] = 1;
-					else truthTable[3][j] = 0;
-				}
-				printf("\n");
-				printmatr(truthTable, argumentsQuantity + 1, truthTableWidth);
-				printf("\n");
+				truthTable = arbitraryToTruthTable(input);
+				printmatr(truthTable, 4, 8);
 				fullNormalForms result = truthTableToFullNormalForms(truthTable, argumentsQuantity, truthTableWidth);
 				cout << "FDNF: " << result.disjunctive << endl;
 				cout << "FCNF: " << result.conjunctive << endl;
