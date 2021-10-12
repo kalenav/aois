@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Header.h"
 #include "math.h"
+#include "lab2tests/pch.h"
 #include <string>
 
 using namespace std;
@@ -79,10 +80,12 @@ int** indexFormToTruthTable(int input)
 fullNormalForms truthTableToFullNormalForms(int** truthTable, int argumentsQuantity, int truthTableWidth) // prints FDNF and FCNF forms of a function from its truth table
 {
 	string disjunctive, conjunctive;
+	int disjunctiveArgumentsNumber = 0, conjunctiveArgumentsNumber = 0;
 	bool firstIteration = true; // needed to print the pluses between the terms correctly
 	for (int j = 0; j < truthTableWidth; j++)
 	{
 		if (truthTable[argumentsQuantity][j] != 1) continue; // we only need to account for sets of variables that a function yields 0 from
+		disjunctiveArgumentsNumber++;
 		if (firstIteration) firstIteration = false;
 		else disjunctive += " + ";
 		disjunctive.push_back('(');
@@ -99,6 +102,7 @@ fullNormalForms truthTableToFullNormalForms(int** truthTable, int argumentsQuant
 	for (int j = 0; j < truthTableWidth; j++)
 	{
 		if (truthTable[argumentsQuantity][j] != 0) continue; // we only need to account for sets of variables that a function yields 1 from
+		conjunctiveArgumentsNumber++;
 		if (firstIteration) firstIteration = false;
 		else conjunctive += " * ";
 		conjunctive.push_back('(');
@@ -112,6 +116,18 @@ fullNormalForms truthTableToFullNormalForms(int** truthTable, int argumentsQuant
 		conjunctive.push_back(')');
 	}
 	fullNormalForms result;
+	if (disjunctiveArgumentsNumber == 0)
+	{
+		result.disjunctive = "1";
+		result.conjunctive = "1";
+		return result;
+	}
+	if (conjunctiveArgumentsNumber == 0)
+	{
+		result.disjunctive = "0";
+		result.conjunctive = "0";
+		return result;
+	}
 	result.disjunctive = disjunctive;
 	result.conjunctive = conjunctive;
 	return result;
