@@ -151,17 +151,17 @@ string concatenateNeighboring(string left, string right)
 
 string concatenateStage1(string input)
 {
-	string result;
+	string intermediateResult;
 	string* constituents;
 	int arrSize = 0, argumentsQuantity = 0;
-	bool readingSymbols = false;
 	for (int i = 0; i < size(input); i++)
 	{
 		if (input[i] == '(') arrSize++;
-		if (input[i] != ' ' && input[i] != '!' && input[i] !=  '*' && input[i] != '+' && input[i] != 'x' && (int)(input[i] - '0') > argumentsQuantity) argumentsQuantity = (int)(input[i] - '0');
+		if (input[i] != ' ' && input[i] != '!' && input[i] !=  '*' && input[i] != '+' && input[i] != 'x' && ((int)(input[i] - '0') > argumentsQuantity)) argumentsQuantity = (int)(input[i] - '0');
 	}
 	constituents = new string [arrSize];
 	int currConstituent = -1;
+	bool readingSymbols = false;
 	for (int i = 0; i < size(input); i++)
 	{
 		if (input[i] == ')')
@@ -184,6 +184,47 @@ string concatenateStage1(string input)
 		for (int currRightConstituent = currLeftConstituent + 1; currRightConstituent < arrSize; currRightConstituent++)
 		{
 			right = constituents[currRightConstituent];
+			if (areNeighboring(left, right))
+			{
+				if (!firstIteration) intermediateResult += connector;
+				else firstIteration = false;
+				intermediateResult += '(';
+				intermediateResult += concatenateNeighboring(left, right);
+				intermediateResult += ')';
+			}
+		}
+	}
+	delete[] constituents;
+	string result;
+	string* implicants;
+	arrSize = 0;
+	for (int i = 0; i < size(intermediateResult); i++)
+	{
+		if (intermediateResult[i] == '(') arrSize++;
+	}
+	implicants = new string [arrSize];
+	int currImplicant = -1;
+	readingSymbols = false;
+	for (int i = 0; i < size(intermediateResult); i++)
+	{
+		if (intermediateResult[i] == ')')
+		{
+			readingSymbols = false;
+		}
+		if (readingSymbols) implicants[currImplicant] += intermediateResult[i];
+		if (intermediateResult[i] == '(')
+		{
+			readingSymbols = true;
+			currImplicant++;
+		}
+	}
+	firstIteration = true;
+	for (int currLeftImplicant = 0; currLeftImplicant < arrSize; currLeftImplicant++)
+	{
+		left = implicants[currLeftImplicant];
+		for (int currRightImplicant = currLeftImplicant + 1; currRightImplicant < arrSize; currRightImplicant++)
+		{
+			right = implicants[currRightImplicant];
 			if (areNeighboring(left, right))
 			{
 				if (!firstIteration) result += connector;
