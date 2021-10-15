@@ -324,5 +324,95 @@ namespace lab2tests
 			Assert::AreEqual(expected.disjunctive, actual.disjunctive);
 			Assert::AreEqual(expected.conjunctive, actual.conjunctive);
 		}
+		TEST_METHOD(checkingArbitraryFunctionInputCorrectness1)
+		{
+			string input = "";
+			Assert::IsFalse(isCorrectArbitraryThreeArgumentFunction(input));
+		}
+		TEST_METHOD(checkingArbitraryFunctionInputCorrectness2)
+		{
+			string input = "hello there";
+			Assert::IsFalse(isCorrectArbitraryThreeArgumentFunction(input));
+		}
+		TEST_METHOD(checkingArbitraryFunctionInputCorrectness3)
+		{
+			string input = "123";
+			Assert::IsFalse(isCorrectArbitraryThreeArgumentFunction(input));
+		}
+		TEST_METHOD(checkingArbitraryFunctionInputCorrectness4)
+		{
+			string input = "x1";
+			Assert::IsFalse(isCorrectArbitraryThreeArgumentFunction(input));
+		}
+		TEST_METHOD(checkingArbitraryFunctionInputCorrectness5)
+		{
+			string input = "x1x2x3";
+			Assert::IsFalse(isCorrectArbitraryThreeArgumentFunction(input));
+		}
+		TEST_METHOD(checkingArbitraryFunctionInputCorrectness6)
+		{
+			string input = "x1x2&&x3";
+			Assert::IsFalse(isCorrectArbitraryThreeArgumentFunction(input));
+		}
+		TEST_METHOD(checkingArbitraryFunctionInputCorrectness7)
+		{
+			string input = "x1||!x2";
+			Assert::IsFalse(isCorrectArbitraryThreeArgumentFunction(input));
+		}
+		TEST_METHOD(checkingArbitraryFunctionInputCorrectness8)
+		{
+			string input = "x1!||x2&&x3";
+			Assert::IsFalse(isCorrectArbitraryThreeArgumentFunction(input));
+		}
+		TEST_METHOD(checkingArbitraryFunctionInputCorrectness9)
+		{
+			string input = "!(x1&&x2)&&!(!(x3||x2)))";
+			Assert::IsFalse(isCorrectArbitraryThreeArgumentFunction(input));
+		}
+		TEST_METHOD(checkingArbitraryFunctionInputCorrectness10)
+		{
+			string input = "!x1&&!x3&&x2!x3";
+			Assert::IsFalse(isCorrectArbitraryThreeArgumentFunction(input));
+		}
+		TEST_METHOD(checkingArbitraryFunctionInputCorrectness11)
+		{
+			string input = "x1&&(x2||x3)";
+			Assert::IsTrue(isCorrectArbitraryThreeArgumentFunction(input));
+		}
+		TEST_METHOD(checkingArbitraryFunctionInputCorrectness12)
+		{
+			string input = "x2||x3&&x1";
+			Assert::IsTrue(isCorrectArbitraryThreeArgumentFunction(input));
+		}
+		TEST_METHOD(checkingArbitraryFunctionInputCorrectness13)
+		{
+			string input = "!x1&&(!x2&&x3)";
+			Assert::IsTrue(isCorrectArbitraryThreeArgumentFunction(input));
+		}
+		TEST_METHOD(checkingArbitraryFunctionInputCorrectness14)
+		{
+			string input = "!(x1||x2&&(x2||x3))";
+			Assert::IsTrue(isCorrectArbitraryThreeArgumentFunction(input));
+		}
+		TEST_METHOD(checkingArbitraryFunctionInputCorrectness15)
+		{
+			string input = "!(x1&&!(x2&&!(x3&&x1)))";
+			Assert::IsTrue(isCorrectArbitraryThreeArgumentFunction(input));
+		}
+		TEST_METHOD(checkingArbitraryFunctionInputCorrectness16)
+		{
+			string input = "x1&&(!x2||(!x1&&!x3))||x2";
+			Assert::IsTrue(isCorrectArbitraryThreeArgumentFunction(input));
+		}
+		TEST_METHOD(checkingArbitraryFunctionInputCorrectness17)
+		{
+			string input = "x1&&x2||x3&&x2||x3||x3||!x2&&x2&&!x1||(!x1&&x2)";
+			Assert::IsTrue(isCorrectArbitraryThreeArgumentFunction(input));
+		}
+		TEST_METHOD(checkingArbitraryFunctionInputCorrectness18)
+		{
+			string input = "!(x1||x2&&x3&&(!x1||x2&&(x2||x3)))&&!x2";
+			Assert::IsTrue(isCorrectArbitraryThreeArgumentFunction(input));
+		}
 	};
 }

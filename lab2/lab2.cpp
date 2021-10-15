@@ -111,6 +111,11 @@ int main()
 				printf("And please refrain from using spaces!\n");
 				printf("Input the function: ");
 				cin >> input;
+				if (!isCorrectArbitraryThreeArgumentFunction(input))
+				{
+					printf("It appears that you have entered something that was not allowed. My disappointment is immeasurable and my day is ruined. I beg of you, consider the notes above.\n");
+					break;
+				}
 				truthTable = arbitraryToTruthTable(input);
 				fullNormalForms result = truthTableToFullNormalForms(truthTable, argumentsQuantity, truthTableWidth);
 				cout << "FDNF: " << result.disjunctive << endl;

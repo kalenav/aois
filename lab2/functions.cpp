@@ -165,38 +165,98 @@ void printmatr(int** matr, int height, int width) // just for debug purposes
 	}
 }
 
-bool isCorrectArbitraryThreeArgumentFunction(string input)
+bool isCorrectArbitraryThreeArgumentFunction(string input) // will check if the input string is... well, it's all in the name, why did i even bother writing this
 {
-	int argumentsQuantity = 0;
-	int bracketsOpened = 0;
+	int bracketsOpened = 0; // will increase by one for every opening bracket and decrease by one for every closing bracket; if it isn't 0 at the end, then there are more opening brackets than there are closing brackets, or vice versa, which isn't allowed
+	bool argument1Found = false; 
+	bool argument2Found = false; // these variables will turn true if the corresponding symbol is found
+	bool argument3Found = false;
+	bool disjunctionFound = false;
+	bool conjunctionFound = false;
 	for (int i = 0; i < size(input); i++)
 	{
-		if (input[i] != 'x' &&
-			input[i] != '1' &&
-			input[i] != '2' &&
-			input[i] != '3' &&
-			input[i] != '(' &&
-			input[i] != ')' &&
-			input[i] != '&' &&
-			input[i] != '|') return false;
+		// firstly, if the current symbol doesn't come from the set of allowed characters, the input string is already incorrect
+		if (input[i] != '!' 
+			&& input[i] != 'x' 
+			&& input[i] != '1' 
+			&& input[i] != '2'
+			&& input[i] != '3' 
+			&& input[i] != '(' 
+			&& input[i] != ')' 
+			&& input[i] != '&' 
+			&& input[i] != '|') return false;
+		// if the current symbol is a 'x', then the symbol after it must be either '1', '2' or '3'; otherwise the input is incorrect
 		if (input[i] == 'x')
 		{
-			if (i == size(input) - 1 || (int)(input[i + 1] - '0') < 0 || (int)(input[i + 1] - '0') > 3) return false;
-			argumentsQuantity++;
+			if (i == size(input) - 1 // if the 'x' symbol is at the end of input, there can't be any number following it
+				|| (int)(input[i + 1] - '0') < 0 // these conditions are based on the fact that the ASCII codes for all digits are consecutive, 
+				|| (int)(input[i + 1] - '0') > 3 // meaning that the difference between the digit's code and the code of '0' is the actual digit. this can be used to check if the symbol following 'x' comes from the set { '1', '2', '3' }
+				|| (i > 0
+					&& input[i - 1] != '&' // what is more, 'x' can only be preceded by an operator, a '!' or a '(', except for the case when 'x' is the first symbol in the input
+					&& input[i - 1] != '|'
+					&& input[i - 1] != '!'
+					&& input[i - 1] != '(')) return false;
 		}
+		if (input[i] == '1') argument1Found = true;
+		if (input[i] == '2') argument2Found = true; // pretty straightforward
+		if (input[i] == '3') argument3Found = true;
 		if (input[i] == '(')
 		{
-			if (i == size(input) - 1 || (input[i + 1] != 'x' && input[i + 1] != '(' && input[i + 1] != '!')) return false;
+			// if the current symbol is a '(', then it can only be followed by 'x', '(' or '!'
+			if (i == size(input) - 1 // there can't be an opening parenthesis at the end of input
+				|| (input[i + 1] != 'x' 
+					&& input[i + 1] != '(' 
+					&& input[i + 1] != '!')) return false;
 			bracketsOpened++;
 		}
 		if (input[i] == ')')
 		{
-			if (i == 0 || (i < size(input) - 1 && input[i + 1] != '&' && input[i + 1] != '|' && input[i + 1] != ')')) return false;
+			// if the current symbol is a ')', then it can only be followed by '&', '|' or ')'
+			if (i == 0 // there can't be a closing parenthesis at the beginning of input
+				|| (i < size(input) - 1 
+					&& input[i + 1] != '&' 
+					&& input[i + 1] != '|' 
+					&& input[i + 1] != ')')) return false;
 			bracketsOpened--;
 		}
+		if (input[i] == '&')
+		{
+			conjunctionFound = true;
+			// if the current symbol is a '&', then it can only be followed by another '&' or an opening parenthesis 
+			// furthermore, it can only be preceded by a closing parenthesis or a variable number
+			if (i == 0
+				|| i == size(input) - 1
+				|| (input[i + 1] != '&'
+					&& input[i - 1] != ')'
+					&& input[i - 1] != '1'
+					&& input[i - 1] != '2'
+					&& input[i - 1] != '3')) return false;
+			else i++; // the second '&' symbol is skipped
+		}
+		if (input[i] == '|')
+		{
+			disjunctionFound = true;
+			// full analogy to the above
+			if (i == 0
+				|| i == size(input) - 1
+				|| (input[i + 1] != '|'
+					&& input[i - 1] != ')'
+					&& input[i - 1] != '1'
+					&& input[i - 1] != '2'
+					&& input[i - 1] != '3')) return false;
+			else i++;
+		}
+		if (input[i] == '!' // if the current symbol is a '!', then it can only be followed by 'x' or '(', and it can't be at the end of input
+			&& (i == size(input) - 1
+				|| (input[i + 1] != 'x' && input[i + 1] != '(')
+				|| (i > 0 // moreover, the '!' can only be preceded by an operator or an opening parenthesis, except for the case then it is the first symbol in the input
+					&& input[i - 1] != '&'
+					&& input[i - 1] != '|'
+					&& input[i - 1] != '('))) return false;
 	}
-	if (argumentsQuantity == 0) return false;
-	if (bracketsOpened != 0) return false;
+	if (!argument1Found || !argument2Found || !argument3Found 
+		|| (!disjunctionFound && !conjunctionFound)) return false; // if some of the arguments weren't found or there were no operators at all, the input is incorrect
+	if (bracketsOpened != 0) return false; // if there are "lone" parentheses, the input is incorrect
 	return true;
 }
 
