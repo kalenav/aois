@@ -165,6 +165,41 @@ void printmatr(int** matr, int height, int width) // just for debug purposes
 	}
 }
 
+bool isCorrectArbitraryThreeArgumentFunction(string input)
+{
+	int argumentsQuantity = 0;
+	int bracketsOpened = 0;
+	for (int i = 0; i < size(input); i++)
+	{
+		if (input[i] != 'x' &&
+			input[i] != '1' &&
+			input[i] != '2' &&
+			input[i] != '3' &&
+			input[i] != '(' &&
+			input[i] != ')' &&
+			input[i] != '&' &&
+			input[i] != '|') return false;
+		if (input[i] == 'x')
+		{
+			if (i == size(input) - 1 || (int)(input[i + 1] - '0') < 0 || (int)(input[i + 1] - '0') > 3) return false;
+			argumentsQuantity++;
+		}
+		if (input[i] == '(')
+		{
+			if (i == size(input) - 1 || (input[i + 1] != 'x' && input[i + 1] != '(' && input[i + 1] != '!')) return false;
+			bracketsOpened++;
+		}
+		if (input[i] == ')')
+		{
+			if (i == 0 || (i < size(input) - 1 && input[i + 1] != '&' && input[i + 1] != '|' && input[i + 1] != ')')) return false;
+			bracketsOpened--;
+		}
+	}
+	if (argumentsQuantity == 0) return false;
+	if (bracketsOpened != 0) return false;
+	return true;
+}
+
 bool threeArgumentLogicalFunctionParser(string input, bool x1, bool x2, bool x3)
 {
 	// will take a string consisting of x1, x2, x3, &&, ||, (), ! and three arguments and evaluate it as a logical function

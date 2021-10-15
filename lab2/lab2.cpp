@@ -15,7 +15,7 @@ int main()
 	int choice;
 	while (true)
 	{
-		printf("Choose action:\n\n1. V(n1, n2, ...) to FDNF/FCNF\n2. fi(x1, x2, ...) to FDNF/FCNF\n3. Arbitrary three-argument function to FDNF/FCNF\n4. Exit\n");
+		printf("Choose action:\n\n1. V(n1, n2, ...) to FDNF/FCNF\n2. fi(x1, x2, x3) to FDNF/FCNF\n3. Arbitrary three-argument function to FDNF/FCNF\n4. Exit\n");
 		scanf("%d", &choice);
 		truthTable = new int*;
 		switch (choice)
@@ -28,15 +28,25 @@ int main()
 				printf("\nInput n1, n2, ...; input -1 when finished\n\n");
 				while(true)
 				{
-					scanf("%d", &currentInput);
-					if (currentInput < 0) break;
+					cin >> currentInput;
+					if (cin.fail())
+					{
+						printf("It appears that you have entered something that was not allowed. My disappointment is immeasurable and my day is ruined. I beg of you, input a natural number.\n");
+						cin.clear();
+						cin.ignore(256, '\n');
+						continue;
+					}
+					if (currentInput < 0)
+					{
+						if (inputQuantity == 0)
+						{
+							printf("Please provide the inputs.\n\n");
+							continue;
+						}
+						else break;
+					}
 					push(&inputs, currentInput, inputQuantity++);
 				} 				
-				if (inputQuantity == 0)
-				{
-					printf("Please provide the inputs.\n\n");
-					break;
-				}
 				printf("Convert V(");
 				for (int i = 0; i < inputQuantity; i++)
 				{
@@ -63,12 +73,14 @@ int main()
 			case 2:
 			{
 				int index = -1;
-				printf("\nInput index: ");
-				scanf("%d", &index);
-				while (index < 0)
+				printf("\nInput a number between 0 and 255: ");
+				cin >> index;
+				while (cin.fail() || index > 255 || index < 0)
 				{
-					printf("Input a non-negative index: ");
-					scanf("%d", &index);
+					printf("It appears that you have entered something that was not allowed. My disappointment is immeasurable and my day is ruined. I beg of you, input a number between 0 and 255.\n");
+					cin.clear();
+					cin.ignore(256, '\n');
+					cin >> index;
 				}
 				truthTable = indexFormToTruthTable(index);
 				argumentsQuantity = 0;
@@ -100,7 +112,6 @@ int main()
 				printf("Input the function: ");
 				cin >> input;
 				truthTable = arbitraryToTruthTable(input);
-				printmatr(truthTable, 4, 8);
 				fullNormalForms result = truthTableToFullNormalForms(truthTable, argumentsQuantity, truthTableWidth);
 				cout << "FDNF: " << result.disjunctive << endl;
 				cout << "FCNF: " << result.conjunctive << endl;
