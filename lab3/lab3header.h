@@ -28,5 +28,3 @@ string reduceViaCalculatingMethod(string input);
 string concatenateNeighboring(string left, string right);
 
 string stage1(string input);
-
-string concatenateStage2(string input);

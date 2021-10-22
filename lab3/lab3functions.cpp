@@ -362,13 +362,16 @@ string stage1(string input)
 			}
 		}
 	}
+	string result;
+	string connector = (input[5] == '*') ? " + " : " * ";
 	int orderMinusTwoImplicantsArraySize = orderMinusTwoImplicants.getSize();
-	bool* redundant = new bool [orderMinusTwoImplicantsArraySize];
-	for (int i = 0; i < orderMinusTwoImplicantsArraySize; i++) redundant[i] = false;
-	return input;
-}
-
-string concatenateStage2(string input)
-{
-	return input;
+	for (int currIndex = 0; currIndex < orderMinusTwoImplicantsArraySize; currIndex++)
+	{
+		if (currIndex > 0) result += connector;
+		result += '(';
+		currImplicant = orderMinusTwoImplicants[currIndex];
+		for (int i = 0; i < size(currImplicant); i++) result += currImplicant[i];
+		result += ')';
+	}
+	return result;
 }
