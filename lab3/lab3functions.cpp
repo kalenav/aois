@@ -1,22 +1,48 @@
 #include "lab3header.h"
 #include <string>
 
-using namespace std;
+void StringArray::push(string pushing)
+{
+	string* newArr = new string[++size];
+	for (int i = 0; i < size - 1; i++) newArr[i] = arr[i];
+	newArr[size - 1] = pushing;
+	arr = newArr;
+}
+
+bool StringArray::has(string searching)
+{
+	for (int i = 0; i < size; i++)
+	{
+		if (arr[i] == searching) return true;
+	}
+	return false;
+}
+
+int StringArray::getSize() { return size; }
+
+string StringArray::operator[](int index)
+{
+	return arr[index];
+}
 
 bool isSKNF(string input, int argumentsQuantity)
 {
 	int* variablesInCurrentParenthesesSet = new int [argumentsQuantity];
+	bool insideParentheses = false;
 	for (int i = 0; i < size(input); i++)
 	{
 		if (input[i] == '(')
 		{
 			for (int j = 0; j < argumentsQuantity; j++) variablesInCurrentParenthesesSet[j] = 0;
+			insideParentheses = true;
 		}
 		if (input[i] != ' ' && input[i] != '!' && input[i] != 'x' && input[i] != '*') variablesInCurrentParenthesesSet[(int)(input[i] - '0') - 1]++;
+		if (insideParentheses && input[i] == '*') return false;
 		if (input[i] == ')')
 		{
 			if (i < size(input) - 2 && input[i + 2] == '+') return false;
 			for (int j = 0; j < argumentsQuantity; j++) if (variablesInCurrentParenthesesSet[j] != 1) return false;
+			insideParentheses = false;
 		}
 	}
 	return true;
@@ -25,17 +51,21 @@ bool isSKNF(string input, int argumentsQuantity)
 bool isSDNF(string input, int argumentsQuantity)
 {
 	int* variablesInCurrentParenthesesSet = new int[argumentsQuantity];
+	bool insideParentheses = false;
 	for (int i = 0; i < size(input); i++)
 	{
 		if (input[i] == '(')
 		{
 			for (int j = 0; j < argumentsQuantity; j++) variablesInCurrentParenthesesSet[j] = 0;
+			insideParentheses = true;
 		}
 		if (input[i] != ' ' && input[i] != '!' && input[i] != 'x' && input[i] != '+') variablesInCurrentParenthesesSet[(int)(input[i] - '0') - 1]++;
+		if (insideParentheses && input[i] == '+') return false;
 		if (input[i] == ')')
 		{
 			if (i < size(input) - 2 && input[i + 2] == '*') return false;
 			for (int j = 0; j < argumentsQuantity; j++) if (variablesInCurrentParenthesesSet[j] != 1) return false;
+			insideParentheses = false;
 		}
 	}
 	return true;
@@ -43,35 +73,168 @@ bool isSDNF(string input, int argumentsQuantity)
 
 bool areNeighboring(string left, string right)
 {
+	char connector;
+	for (int i = 0; i < size(left); i++)
+	{
+		if (left[i] == '+')
+		{
+			connector = '+';
+			break;
+		}
+		if (left[i] == '*')
+		{
+			connector = '*';
+			break;
+		}
+		if (i == size(left) - 1) return false;
+	}
+	for (int i = 2; i < size(left); i++)
+	{
+		if (left[i] == 'x')
+		{
+			if (left[i - 1] == '!')
+			{
+				if (left[i - 3] != connector) return false;
+			}
+			else if (left[i - 2] != connector) return false;
+		}
+	}
+	for (int i = 2; i < size(right); i++)
+	{
+		if (right[i] == 'x')
+		{
+			if (right[i - 1] == '!')
+			{
+				if (right[i - 3] != connector) return false;
+			}
+			else if (right[i - 2] != connector) return false;
+		}
+	}
 	int differentArguments = 0;
+	int leftArguments = 0, rightArguments = 0;
 	for (int leftIndex = 0; leftIndex < size(left) - 2; leftIndex++)
 	{
+		if (left[leftIndex] == 'x') leftArguments++;
 		if (left[leftIndex] == '!')
 		{
-			for (int rightIndex = 1; rightIndex < size(right); rightIndex++)
+			for (int rightIndex = 0; rightIndex < size(right); rightIndex++)
 			{
-				if (right[rightIndex] == left[leftIndex + 2] && (rightIndex - 2 == -1 || right[rightIndex - 2] == ' ')) differentArguments++;
+				if (right[rightIndex] == left[leftIndex + 2])
+				{
+					if (rightIndex == 1 || right[rightIndex - 2] == ' ') differentArguments++;
+					break;
+				}
+				if (rightIndex == size(right) - 1) return false;
 			}
 		}
 	}
 	for (int rightIndex = 0; rightIndex < size(right) - 2; rightIndex++)
 	{
+		if (right[rightIndex] == 'x') rightArguments++;
 		if (right[rightIndex] == '!')
 		{
-			for (int leftIndex = 1; leftIndex < size(left); leftIndex++)
+			for (int leftIndex = 0; leftIndex < size(left); leftIndex++)
 			{
-				if (left[leftIndex] == right[rightIndex + 2] && (leftIndex - 2 == -1 || left[leftIndex - 2] == ' ')) differentArguments++;
+				if (left[leftIndex] == right[rightIndex + 2])
+				{
+					if(leftIndex == 1 || left[leftIndex - 2] == ' ') differentArguments++;
+					break;
+				}
+				if (leftIndex == size(left) - 1) return false;
 			}
 		}
 	}
+	if (leftArguments != rightArguments) return false;
 	if (differentArguments == 1) return true;
+	else return false;
+}
+
+bool areEquivalent(string left, string right)
+{
+	char connector;
+	for (int i = 0; i < size(left); i++)
+	{
+		if (left[i] == '+')
+		{
+			connector = '+';
+			break;
+		}
+		if (left[i] == '*')
+		{
+			connector = '*';
+			break;
+		}
+		if (i == size(left) - 1)
+		{
+			if (size(left) > 2) return false;
+			else return left[1] == right[1];
+		}
+	}
+	for (int i = 2; i < size(left); i++)
+	{
+		if (left[i] == 'x')
+		{
+			if (left[i - 1] == '!')
+			{
+				if (left[i - 3] != connector) return false;
+			}
+			else if (left[i - 2] != connector) return false;
+		}
+	}
+	for (int i = 2; i < size(right); i++)
+	{
+		if (right[i] == 'x')
+		{
+			if (right[i - 1] == '!')
+			{
+				if (right[i - 3] != connector) return false;
+			}
+			else if (right[i - 2] != connector) return false;
+		}
+	}
+	int differentArguments = 0;
+	int leftArguments = 0, rightArguments = 0;
+	for (int leftIndex = 0; leftIndex < size(left) - 2; leftIndex++)
+	{
+		if (left[leftIndex] == 'x') leftArguments++;
+		if (left[leftIndex] == '!')
+		{
+			for (int rightIndex = 0; rightIndex < size(right); rightIndex++)
+			{
+				if (right[rightIndex] == left[leftIndex + 2])
+				{
+					if (rightIndex == 1 || right[rightIndex - 2] == ' ') differentArguments++;
+					break;
+				}
+				if (rightIndex == size(right) - 1) return false;
+			}
+		}
+	}
+	for (int rightIndex = 0; rightIndex < size(right) - 2; rightIndex++)
+	{
+		if (right[rightIndex] == 'x') rightArguments++;
+		if (right[rightIndex] == '!')
+		{
+			for (int leftIndex = 0; leftIndex < size(left); leftIndex++)
+			{
+				if (left[leftIndex] == right[rightIndex + 2])
+				{
+					if (leftIndex == 1 || left[leftIndex - 2] == ' ') differentArguments++;
+					break;
+				}
+				if (leftIndex == size(left) - 1) return false;
+			}
+		}
+	}
+	if (leftArguments != rightArguments) return false;
+	if (differentArguments == 0) return true;
 	else return false;
 }
 
 string reduceViaCalculatingMethod(string input)
 {
 	string result = input;
-	result = concatenateStage1(result);
+	result = stage1(result);
 	result = concatenateStage2(result);
 	return result;
 }
@@ -107,7 +270,7 @@ string concatenateNeighboring(string left, string right)
 			{
 				for (int rightIndex = 0; rightIndex < size(right) - 1; rightIndex++)
 				{
-					if (right[rightIndex] == 'x' && right[rightIndex + 1] == currentPossibleExtraTerm[1] && (rightIndex == 0 || right[rightIndex - 1] == '!'))
+					if (right[rightIndex] == 'x' && right[rightIndex + 1] == currentPossibleExtraTerm[1] && rightIndex != 0 && right[rightIndex - 1] == '!')
 					{
 						extraTermIndex = leftIndex;
 						breakUpperCycle = true;
@@ -149,93 +312,60 @@ string concatenateNeighboring(string left, string right)
 	return result;
 }
 
-string concatenateStage1(string input)
+string stage1(string input)
 {
-	string intermediateResult;
-	string* constituents;
-	int arrSize = 0, argumentsQuantity = 0;
-	for (int i = 0; i < size(input); i++)
-	{
-		if (input[i] == '(') arrSize++;
-		if (input[i] != ' ' && input[i] != '!' && input[i] !=  '*' && input[i] != '+' && input[i] != 'x' && ((int)(input[i] - '0') > argumentsQuantity)) argumentsQuantity = (int)(input[i] - '0');
-	}
-	constituents = new string [arrSize];
-	int currConstituent = -1;
+	int constituentQuantity = 0;
+	for (int i = 0; i < size(input); i++) if (input[i] == '(') constituentQuantity++;
+	StringArray constituents;
+	string currConstituent;
 	bool readingSymbols = false;
 	for (int i = 0; i < size(input); i++)
 	{
 		if (input[i] == ')')
 		{
 			readingSymbols = false;
+			if(!constituents.has(currConstituent)) constituents.push(currConstituent);
+			currConstituent = "";
 		}
-		if (readingSymbols) constituents[currConstituent] += input[i];
-		if (input[i] == '(')
-		{
-			readingSymbols = true;
-			currConstituent++;
-		}
+		if (readingSymbols) currConstituent += input[i];
+		if (input[i] == '(') readingSymbols = true;
 	}
-	string left, right;
-	string connector = (isSDNF(input, argumentsQuantity)) ? " + " : " * ";
-	bool firstIteration = true;
-	for (int currLeftConstituent = 0; currLeftConstituent < arrSize; currLeftConstituent++)
+	StringArray orderMinusOneImplicants;
+	string currImplicant, currLeftConstituent, currRightConstituent;
+	int constituentsArraySize = constituents.getSize();
+	for (int leftIndex = 0; leftIndex < constituentsArraySize; leftIndex++)
 	{
-		left = constituents[currLeftConstituent];
-		for (int currRightConstituent = currLeftConstituent + 1; currRightConstituent < arrSize; currRightConstituent++)
+		currLeftConstituent = constituents[leftIndex];
+		for (int rightIndex = leftIndex + 1; rightIndex < constituentsArraySize; rightIndex++)
 		{
-			right = constituents[currRightConstituent];
-			if (areNeighboring(left, right))
+			currRightConstituent = constituents[rightIndex];
+			if (areNeighboring(currLeftConstituent, currRightConstituent))
 			{
-				if (!firstIteration) intermediateResult += connector;
-				else firstIteration = false;
-				intermediateResult += '(';
-				intermediateResult += concatenateNeighboring(left, right);
-				intermediateResult += ')';
+				currImplicant = concatenateNeighboring(currLeftConstituent, currRightConstituent);
+				if (!orderMinusOneImplicants.has(currImplicant)) orderMinusOneImplicants.push(currImplicant);
 			}
 		}
 	}
-	delete[] constituents;
-	string result;
-	string* implicants;
-	arrSize = 0;
-	for (int i = 0; i < size(intermediateResult); i++)
+	StringArray orderMinusTwoImplicants;
+	string currLeftImplicant, currRightImplicant;
+	int orderMinusOneImplicantsArraySize = orderMinusOneImplicants.getSize();
+	for (int leftIndex = 0; leftIndex < orderMinusOneImplicantsArraySize; leftIndex++)
 	{
-		if (intermediateResult[i] == '(') arrSize++;
-	}
-	implicants = new string [arrSize];
-	int currImplicant = -1;
-	readingSymbols = false;
-	for (int i = 0; i < size(intermediateResult); i++)
-	{
-		if (intermediateResult[i] == ')')
+		currLeftImplicant = orderMinusOneImplicants[leftIndex];
+		for (int rightIndex = leftIndex + 1; rightIndex < orderMinusOneImplicantsArraySize; rightIndex++)
 		{
-			readingSymbols = false;
-		}
-		if (readingSymbols) implicants[currImplicant] += intermediateResult[i];
-		if (intermediateResult[i] == '(')
-		{
-			readingSymbols = true;
-			currImplicant++;
-		}
-	}
-	firstIteration = true;
-	for (int currLeftImplicant = 0; currLeftImplicant < arrSize; currLeftImplicant++)
-	{
-		left = implicants[currLeftImplicant];
-		for (int currRightImplicant = currLeftImplicant + 1; currRightImplicant < arrSize; currRightImplicant++)
-		{
-			right = implicants[currRightImplicant];
-			if (areNeighboring(left, right))
+			currRightImplicant = orderMinusOneImplicants[rightIndex];
+			if (areNeighboring(currLeftImplicant, currRightImplicant))
 			{
-				if (!firstIteration) result += connector;
-				else firstIteration = false;
-				result += '(';
-				result += concatenateNeighboring(left, right);
-				result += ')';
+				currImplicant = concatenateNeighboring(currLeftImplicant, currRightImplicant);
+				if (!orderMinusTwoImplicants.has(currImplicant)) orderMinusTwoImplicants.push(currImplicant);
 			}
 		}
 	}
-	return result;
+	int orderMinusTwoImplicantsArraySize = orderMinusTwoImplicants.getSize();
+	bool* redundant = new bool [orderMinusTwoImplicantsArraySize];
+	for (int i = 0; i < orderMinusTwoImplicantsArraySize; i++) redundant[i] = false;
+	return input;
 }
 
 string concatenateStage2(string input)
