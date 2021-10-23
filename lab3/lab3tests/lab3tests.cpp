@@ -120,26 +120,20 @@ namespace lab3tests
 		}
 		TEST_METHOD(stage1_2)
 		{
-			string expected = "";
-			string actual = stage1("");
+			string expected = "(x1 + !x3)";
+			string actual = stage1("(x1 + x2 + !x3 + x4) * (x1 + x2 + !x3 + !x4) * (x1 + !x2 + !x3 + !x4) * (x1 + !x2 + !x3 + x4)");
 			Assert::AreEqual(expected, actual);
 		}
 		TEST_METHOD(stage1_3)
 		{
-			string expected = "";
-			string actual = stage1("");
+			string expected = "(x1 * x3) + (x1 * !x4)";
+			string actual = stage1("(x1 * !x2 * x3 * !x4) + (x1 * !x2 * x3 * x4) + (x1 * x2 * x3 * !x4) + (x1 * x2 * x3 * x4) + (!x1 * !x2 * !x3 * !x4) + (x1 * !x2 * !x3 * !x4) + (x1 * x2 * !x3 * !x4)");
 			Assert::AreEqual(expected, actual);
 		}
 		TEST_METHOD(stage1_4)
 		{
-			string expected = "";
-			string actual = stage1("");
-			Assert::AreEqual(expected, actual);
-		}
-		TEST_METHOD(stage1_5)
-		{
-			string expected = "";
-			string actual = stage1("");
+			string expected = "(x2 + x4 + !x5)";
+			string actual = stage1("(x1 + x2 + !x3 + x4 + !x5) * (x1 + x2 + x3 + x4 + !x5) * (x1 + !x2 + !x3 + x4 + !x5) * (x1 + x2 + !x3 + x4 + x5) * (!x1 + x2 + !x3 + x4 + !x5) * (!x1 + x2 + x3 + x4 + !x5)");
 			Assert::AreEqual(expected, actual);
 		}
 	};
