@@ -11,7 +11,9 @@ void StringArray::push(string pushing)
 	string* newArr = new string[++size];
 	for (int i = 0; i < size - 1; i++) newArr[i] = arr[i];
 	newArr[size - 1] = pushing;
+	string* dummy = arr;
 	arr = newArr;
+	delete[] dummy;
 }
 
 bool StringArray::has(string searching)
@@ -76,22 +78,29 @@ bool isSDNF(string input, int argumentsQuantity)
 	return true;
 }
 
-bool areNeighboring(string left, string right)
+bool bothSumOrProduct(string left, string right)
 {
-	char connector;
-	for (int i = 0; i < size(left); i++)
+	string twoOrMoreArgumentFunction;
+	if (size(left) == 2)
 	{
-		if (left[i] == '+')
+		if (size(right) == 2) return true;
+		else twoOrMoreArgumentFunction = right;
+	}
+	else twoOrMoreArgumentFunction = left;
+	char connector;
+	for (int i = 0; i < size(twoOrMoreArgumentFunction); i++)
+	{
+		if (twoOrMoreArgumentFunction[i] == '+')
 		{
 			connector = '+';
 			break;
 		}
-		if (left[i] == '*')
+		if (twoOrMoreArgumentFunction[i] == '*')
 		{
 			connector = '*';
 			break;
 		}
-		if (i == size(left) - 1) return false;
+		if (i == size(twoOrMoreArgumentFunction) - 1) return false;
 	}
 	for (int i = 2; i < size(left); i++)
 	{
@@ -115,6 +124,12 @@ bool areNeighboring(string left, string right)
 			else if (right[i - 2] != connector) return false;
 		}
 	}
+	return true;
+}
+
+bool areNeighboring(string left, string right)
+{
+	if (!bothSumOrProduct(left, right)) return false;
 	int differentArguments = 0;
 	int leftArguments = 0, rightArguments = 0;
 	for (int leftIndex = 0; leftIndex < size(left) - 1; leftIndex++)
@@ -146,87 +161,62 @@ bool areNeighboring(string left, string right)
 
 bool areEquivalent(string left, string right)
 {
-	char connector;
-	for (int i = 0; i < size(left); i++)
-	{
-		if (left[i] == '+')
-		{
-			connector = '+';
-			break;
-		}
-		if (left[i] == '*')
-		{
-			connector = '*';
-			break;
-		}
-		if (i == size(left) - 1)
-		{
-			if (size(left) > 2) return false;
-			else return left[1] == right[1];
-		}
-	}
-	for (int i = 2; i < size(left); i++)
-	{
-		if (left[i] == 'x')
-		{
-			if (left[i - 1] == '!')
-			{
-				if (left[i - 3] != connector) return false;
-			}
-			else if (left[i - 2] != connector) return false;
-		}
-	}
-	for (int i = 2; i < size(right); i++)
-	{
-		if (right[i] == 'x')
-		{
-			if (right[i - 1] == '!')
-			{
-				if (right[i - 3] != connector) return false;
-			}
-			else if (right[i - 2] != connector) return false;
-		}
-	}
-	int differentArguments = 0;
+	if (!bothSumOrProduct(left, right)) return false;
 	int leftArguments = 0, rightArguments = 0;
-	for (int leftIndex = 0; leftIndex < size(left) - 2; leftIndex++)
+	for (int leftIndex = 0; leftIndex < size(left) - 1; leftIndex++)
 	{
-		if (left[leftIndex] == 'x') leftArguments++;
-		if (left[leftIndex] == '!')
+		if (left[leftIndex] == 'x')
 		{
-			for (int rightIndex = 0; rightIndex < size(right); rightIndex++)
+			leftArguments++;
+			bool leftNegated = (leftIndex > 0 && left[leftIndex - 1] == '!');
+			for (int rightIndex = 0; rightIndex < size(right) - 1; rightIndex++)
 			{
-				if (right[rightIndex] == left[leftIndex + 2])
+				if (right[rightIndex + 1] == left[leftIndex + 1])
 				{
-					if (rightIndex == 1 || right[rightIndex - 2] == ' ') differentArguments++;
+					rightArguments++;
+					bool rightNegated = (rightIndex > 0 && right[rightIndex - 1] == '!');
+					if (leftNegated ^ rightNegated) return false;
 					break;
 				}
-				if (rightIndex == size(right) - 1) return false;
-			}
-		}
-	}
-	for (int rightIndex = 0; rightIndex < size(right) - 2; rightIndex++)
-	{
-		if (right[rightIndex] == 'x') rightArguments++;
-		if (right[rightIndex] == '!')
-		{
-			for (int leftIndex = 0; leftIndex < size(left); leftIndex++)
-			{
-				if (left[leftIndex] == right[rightIndex + 2])
-				{
-					if (leftIndex == 1 || left[leftIndex - 2] == ' ') differentArguments++;
-					break;
-				}
-				if (leftIndex == size(left) - 1) return false;
+				if (rightIndex == size(right) - 2) return false;
 			}
 		}
 	}
 	if (leftArguments != rightArguments) return false;
-	if (differentArguments == 0) return true;
-	else return false;
+	return true;
+}
+
+bool aSubfunctionOf(string function, string subfunction)
+{
+	if (!bothSumOrProduct(function, subfunction)) return false;
+	for (int sfIndex = 0; sfIndex < size(subfunction) - 1; sfIndex++)
+	{
+		if (subfunction[sfIndex] == 'x')
+		{
+			bool sfargNegated = (sfIndex > 0 && subfunction[sfIndex - 1] == '!');
+			for (int fIndex = 0; fIndex < size(function) - 1; fIndex++)
+			{
+				if (function[fIndex + 1] == subfunction[sfIndex + 1])
+				{
+					bool fargNegated = (fIndex > 0 && function[fIndex - 1] == '!');
+					if (sfargNegated ^ fargNegated) return false;
+					break;
+				}
+				if (fIndex == size(function) - 2) return false;
+			}
+		}
+	}
+	return true;
 }
 
 string reduceViaCalculatingMethod(string input)
+{
+	string result = input;
+	result = stage1(result);
+	return result;
+}
+
+string reduceViaTableCalculatingMethod(string input)
 {
 	string result = input;
 	result = stage1(result);

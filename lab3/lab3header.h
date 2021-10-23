@@ -20,11 +20,17 @@ bool isSKNF(string input, int argumentsQuantity);
 
 bool isSDNF(string input, int argumentsQuantity);
 
+bool bothSumOrProduct(string left, string right);
+
 bool areNeighboring(string left, string right);
 
 bool areEquivalent(string left, string right);
 
+bool aSubfunctionOf(string function, string subfunction);
+
 string reduceViaCalculatingMethod(string input);
+
+string reduceViaTableCalculatingMethod(string input);
 
 string concatenateNeighboring(string left, string right);
 
