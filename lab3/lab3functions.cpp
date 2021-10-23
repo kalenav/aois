@@ -1,9 +1,28 @@
 #include "lab3header.h"
 #include <string>
 
+StringArray::StringArray()
+{
+
+}
+
+StringArray::StringArray(const StringArray& copying)
+{
+	size = copying.size;
+	arr = new string[size];
+	for (int i = 0; i < size; i++) arr[i] = copying.arr[i];
+}
+
 StringArray::~StringArray()
 {
 	if(size > 0) delete[] arr;
+}
+
+void StringArray::operator=(const StringArray& copying)
+{
+	size = copying.size;
+	arr = new string[size];
+	for (int i = 0; i < size; i++) arr[i] = copying.arr[i];
 }
 
 void StringArray::push(string pushing)
@@ -28,6 +47,47 @@ bool StringArray::has(string searching)
 int StringArray::getSize() { return size; }
 
 string StringArray::operator[](int index)
+{
+	return arr[index];
+}
+
+BoolArray::BoolArray()
+{
+
+}
+
+BoolArray::BoolArray(const BoolArray& copying)
+{
+	size = copying.size;
+	arr = new bool[size];
+	for (int i = 0; i < size; i++) arr[i] = copying.arr[i];
+}
+
+BoolArray::~BoolArray()
+{
+	if (size > 0) delete[] arr;
+}
+
+void BoolArray::operator=(const BoolArray& copying)
+{
+	size = copying.size;
+	arr = new bool[size];
+	for (int i = 0; i < size; i++) arr[i] = copying.arr[i];
+}
+
+void BoolArray::push(bool pushing)
+{
+	bool* newArr = new bool[++size];
+	for (int i = 0; i < size - 1; i++) newArr[i] = arr[i];
+	newArr[size - 1] = pushing;
+	bool* dummy = arr;
+	arr = newArr;
+	delete[] dummy;
+}
+
+int BoolArray::getSize() { return size; }
+
+bool BoolArray::operator[](int index)
 {
 	return arr[index];
 }
@@ -209,18 +269,23 @@ bool aSubfunctionOf(string function, string subfunction)
 	return true;
 }
 
-string reduceViaCalculatingMethod(string input)
+bool evaluateFunction(string input, BoolArray args, int currArg)
 {
-	string result = input;
-	result = stage1(result);
-	return result;
-}
-
-string reduceViaTableCalculatingMethod(string input)
-{
-	string result = input;
-	result = stage1(result);
-	return result;
+	if (currArg == args.getSize() - 1) return args[currArg];
+	int separatorIndex;
+	for (int i = 0; i < size(input); i++)
+	{
+		if (input[i] == ' ')
+		{
+			separatorIndex = i + 1;
+			break;
+		}
+	}
+	string rightSide;
+	bool leftSide = (input[0] == '!') ? !args[currArg] : args[currArg];
+	for (int i = separatorIndex + 2; i < size(input); i++) rightSide += input[i];
+	if (input[separatorIndex] == '+') return leftSide || evaluateFunction(rightSide, args, currArg + 1);
+	else return leftSide && evaluateFunction(rightSide, args, currArg + 1);
 }
 
 string concatenateNeighboring(string left, string right)
@@ -296,9 +361,18 @@ string concatenateNeighboring(string left, string right)
 	return result;
 }
 
-string stage1(string input)
+string reduceViaCalculatingMethod(string input)
 {
-	if (size(input) == 2 || size(input) == 3) return input;
+	return input;
+}
+
+string reduceViaTableCalculatingMethod(string input)
+{
+	return input;
+}
+
+string concatenateAllNeighboringIn(string input)
+{
 	int constituentQuantity = 0;
 	for (int i = 0; i < size(input); i++) if (input[i] == '(') constituentQuantity++;
 	StringArray constituents;
@@ -315,64 +389,190 @@ string stage1(string input)
 		if (readingSymbols) currConstituent += input[i];
 		if (input[i] == '(') readingSymbols = true;
 	}
-	for (int i = 0; i < constituents.getSize(); i++) cout << constituents[i] << endl;
-	cout << endl;
 	StringArray orderMinusOneImplicants;
 	string currImplicant, currLeftConstituent, currRightConstituent;
 	int constituentsArraySize = constituents.getSize();
+	bool* usedConstituents = new bool [constituentsArraySize];
+	for (int i = 0; i < constituentsArraySize; i++) usedConstituents[i] = false;
 	for (int leftIndex = 0; leftIndex < constituentsArraySize; leftIndex++)
 	{
+		if (usedConstituents[leftIndex]) continue;
 		currLeftConstituent = constituents[leftIndex];
 		for (int rightIndex = leftIndex + 1; rightIndex < constituentsArraySize; rightIndex++)
 		{
+			if (usedConstituents[rightIndex]) continue;
 			currRightConstituent = constituents[rightIndex];
 			if (areNeighboring(currLeftConstituent, currRightConstituent))
 			{
+				usedConstituents[leftIndex] = true;
+				usedConstituents[rightIndex] = true;
 				currImplicant = concatenateNeighboring(currLeftConstituent, currRightConstituent);
 				if (!orderMinusOneImplicants.has(currImplicant)) orderMinusOneImplicants.push(currImplicant);
+				break;
 			}
 		}
 	}
-	for (int i = 0; i < orderMinusOneImplicants.getSize(); i++) cout << orderMinusOneImplicants[i] << endl;
-	cout << endl;
 	StringArray orderMinusTwoImplicants;
 	string currLeftImplicant, currRightImplicant;
 	int orderMinusOneImplicantsArraySize = orderMinusOneImplicants.getSize();
+	bool* usedOrderMinusOneImplicants = new bool [orderMinusOneImplicantsArraySize];
+	for (int i = 0; i < orderMinusOneImplicantsArraySize; i++) usedOrderMinusOneImplicants[i] = false;
 	for (int leftIndex = 0; leftIndex < orderMinusOneImplicantsArraySize; leftIndex++)
 	{
+		if (usedOrderMinusOneImplicants[leftIndex]) continue;
 		currLeftImplicant = orderMinusOneImplicants[leftIndex];
 		for (int rightIndex = leftIndex + 1; rightIndex < orderMinusOneImplicantsArraySize; rightIndex++)
 		{
+			if (usedOrderMinusOneImplicants[rightIndex]) continue;
 			currRightImplicant = orderMinusOneImplicants[rightIndex];
 			if (areNeighboring(currLeftImplicant, currRightImplicant))
 			{
+				usedOrderMinusOneImplicants[leftIndex] = true;
+				usedOrderMinusOneImplicants[rightIndex] = true;
 				currImplicant = concatenateNeighboring(currLeftImplicant, currRightImplicant);
 				if (!orderMinusTwoImplicants.has(currImplicant)) orderMinusTwoImplicants.push(currImplicant);
+				break;
 			}
 		}
 	}
-	for (int i = 0; i < orderMinusTwoImplicants.getSize(); i++) cout << orderMinusTwoImplicants[i] << endl;
-	cout << endl;
-	string result;
+	int orderMinusTwoImplicantsArraySize = orderMinusTwoImplicants.getSize();
 	string connector;
-	for (int i = 0; i < size(input) - 2; i++)
+	for (int i = 0; i < size(input); i++)
 	{
-		if (input[i] == ')')
+		if (input[i] == ' ')
 		{
 			connector += ' ';
-			connector += input[i + 2];
+			if (input[i + 1] == '*') connector += '+';
+			else connector += '*';
 			connector += ' ';
 			break;
 		}
 	}
-	int orderMinusTwoImplicantsArraySize = orderMinusTwoImplicants.getSize();
-	for (int currIndex = 0; currIndex < orderMinusTwoImplicantsArraySize; currIndex++)
+	string intermediateResult;
+	for (int i = 0; i < constituentsArraySize; i++)
 	{
-		if (currIndex > 0) result += connector;
-		result += '(';
-		currImplicant = orderMinusTwoImplicants[currIndex];
-		for (int i = 0; i < size(currImplicant); i++) result += currImplicant[i];
-		result += ')';
+		if (!usedConstituents[i])
+		{
+			intermediateResult += '(';
+			intermediateResult += constituents[i];
+			intermediateResult += ')';
+			intermediateResult += connector;
+		}
 	}
+	for (int i = 0; i < orderMinusOneImplicantsArraySize; i++)
+	{
+		if (!usedOrderMinusOneImplicants[i])
+		{
+			intermediateResult += '(';
+			intermediateResult += orderMinusOneImplicants[i];
+			intermediateResult += ')';
+			intermediateResult += connector;
+		}
+	}
+	for (int i = 0; i < orderMinusTwoImplicantsArraySize; i++)
+	{
+		intermediateResult += '(';
+		intermediateResult += orderMinusTwoImplicants[i];
+		intermediateResult += ')';
+		intermediateResult += connector;
+	}
+	string result;
+	for (int i = 0; i < size(intermediateResult) - 3; i++) result += intermediateResult[i];
+	return result;
+}
+
+string consumeAllIn(string input)
+{
+	string connector;
+	for (int i = 0; i < size(input); i++)
+	{
+		if (input[i] == ' ')
+		{
+			connector += ' ';
+			connector += (input[i + 1] == '*') ? '+' : '*';
+			connector += ' ';
+			break;
+		}
+	}
+	bool changeMade = false;
+	string result = input;
+	do
+	{
+		changeMade = false;
+		StringArray expressions;
+		StringArray resultArr;
+		string currExpression;
+		bool readingSymbols = false;
+		for (int i = 0; i < size(result); i++)
+		{
+			if (result[i] == ')')
+			{
+				readingSymbols = false;
+				if (!expressions.has(currExpression)) expressions.push(currExpression);
+				currExpression = "";
+			}
+			if (readingSymbols) currExpression += result[i];
+			if (result[i] == '(') readingSymbols = true;
+		}
+		string currLeftExpression, currRightExpression;
+		int expressionsArraySize = expressions.getSize();
+		bool* consumed = new bool [expressionsArraySize];
+		for (int i = 0; i < expressionsArraySize; i++) consumed[i] = false;
+		if (expressionsArraySize == 1) resultArr = expressions;
+		else 
+		{
+			for (int leftIndex = 0; leftIndex < expressionsArraySize; leftIndex++)
+			{
+				currLeftExpression = expressions[leftIndex];
+				if (changeMade && !resultArr.has(currLeftExpression) && !consumed[leftIndex]) resultArr.push(currLeftExpression);
+				for (int rightIndex = 0; rightIndex < expressionsArraySize; rightIndex++)
+				{
+					if (leftIndex == rightIndex) continue;
+					currRightExpression = expressions[rightIndex];
+					if (changeMade && !resultArr.has(currRightExpression) && !consumed[rightIndex])
+					{
+						resultArr.push(currRightExpression);
+						continue;
+					}
+					if (aSubfunctionOf(currLeftExpression, currRightExpression) && !resultArr.has(currRightExpression))
+					{
+						resultArr.push(currRightExpression);
+						consumed[leftIndex] = true;
+						changeMade = true;
+					}
+					if (aSubfunctionOf(currRightExpression, currLeftExpression) && !resultArr.has(currLeftExpression))
+					{
+						resultArr.push(currLeftExpression);
+						consumed[rightIndex] = true;
+						changeMade = true;
+					}
+				}
+			}
+		}
+		if (!changeMade) resultArr = expressions;
+		result = "";
+		int resultArrSize = resultArr.getSize();
+		for (int i = 0; i < resultArrSize; i++)
+		{
+			if (i > 0) result += connector;
+			result += '(';
+			result += resultArr[i];
+			result += ')';
+		}
+	} 	
+	while (changeMade);
+	return result;
+}
+
+string stage1(string input)
+{
+	string result = input, prevResult;
+	do
+	{
+		prevResult = result;
+		result = concatenateAllNeighboringIn(result);
+		result = consumeAllIn(result);
+	} 	
+	while (prevResult != result);
 	return result;
 }

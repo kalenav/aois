@@ -9,11 +9,29 @@ private:
 	string* arr;
 	int size = 0;
 public:
+	StringArray();
+	StringArray(const StringArray& copying);
 	~StringArray();
 	void push(string pushing);
 	bool has(string searching);
 	int getSize();
 	string operator[](int index);
+	void operator=(const StringArray& copying);
+};
+
+class BoolArray
+{
+private:
+	bool* arr;
+	int size = 0;
+public:
+	BoolArray();
+	BoolArray(const BoolArray& copying);
+	~BoolArray();
+	void push(bool pushing);
+	int getSize();
+	bool operator[](int index);
+	void operator=(const BoolArray& copying);
 };
 
 bool isSKNF(string input, int argumentsQuantity);
@@ -28,10 +46,16 @@ bool areEquivalent(string left, string right);
 
 bool aSubfunctionOf(string function, string subfunction);
 
+bool evaluateFunction(string function, BoolArray args, int currArg);
+
 string reduceViaCalculatingMethod(string input);
 
 string reduceViaTableCalculatingMethod(string input);
 
 string concatenateNeighboring(string left, string right);
+
+string concatenateAllNeighboringIn(string input);
+
+string consumeAllIn(string input);
 
 string stage1(string input);
