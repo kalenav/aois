@@ -1,6 +1,11 @@
 #include "lab3header.h"
 #include <string>
 
+StringArray::~StringArray()
+{
+	if(size > 0) delete[] arr;
+}
+
 void StringArray::push(string pushing)
 {
 	string* newArr = new string[++size];
@@ -112,37 +117,27 @@ bool areNeighboring(string left, string right)
 	}
 	int differentArguments = 0;
 	int leftArguments = 0, rightArguments = 0;
-	for (int leftIndex = 0; leftIndex < size(left) - 2; leftIndex++)
+	for (int leftIndex = 0; leftIndex < size(left) - 1; leftIndex++)
 	{
-		if (left[leftIndex] == 'x') leftArguments++;
-		if (left[leftIndex] == '!')
+		if (left[leftIndex] == 'x')
 		{
-			for (int rightIndex = 0; rightIndex < size(right); rightIndex++)
+			leftArguments++;
+			bool leftNegated = (leftIndex > 0 && left[leftIndex - 1] == '!');
+			for (int rightIndex = 0; rightIndex < size(right) - 1; rightIndex++)
 			{
-				if (right[rightIndex] == left[leftIndex + 2])
+				if (right[rightIndex] == 'x' && right[rightIndex + 1] == left[leftIndex + 1])
 				{
-					if (rightIndex == 1 || right[rightIndex - 2] == ' ') differentArguments++;
+					bool rightNegated = (rightIndex > 0 && right[rightIndex - 1] == '!');
+					if(leftNegated ^ rightNegated) differentArguments++;
 					break;
 				}
-				if (rightIndex == size(right) - 1) return false;
+				if (rightIndex == size(right) - 2) return false;
 			}
 		}
 	}
-	for (int rightIndex = 0; rightIndex < size(right) - 2; rightIndex++)
+	for (int rightIndex = 0; rightIndex < size(right); rightIndex++)
 	{
 		if (right[rightIndex] == 'x') rightArguments++;
-		if (right[rightIndex] == '!')
-		{
-			for (int leftIndex = 0; leftIndex < size(left); leftIndex++)
-			{
-				if (left[leftIndex] == right[rightIndex + 2])
-				{
-					if(leftIndex == 1 || left[leftIndex - 2] == ' ') differentArguments++;
-					break;
-				}
-				if (leftIndex == size(left) - 1) return false;
-			}
-		}
 	}
 	if (leftArguments != rightArguments) return false;
 	if (differentArguments == 1) return true;
@@ -235,7 +230,6 @@ string reduceViaCalculatingMethod(string input)
 {
 	string result = input;
 	result = stage1(result);
-	result = concatenateStage2(result);
 	return result;
 }
 
@@ -314,6 +308,7 @@ string concatenateNeighboring(string left, string right)
 
 string stage1(string input)
 {
+	if (size(input) == 2 || size(input) == 3) return input;
 	int constituentQuantity = 0;
 	for (int i = 0; i < size(input); i++) if (input[i] == '(') constituentQuantity++;
 	StringArray constituents;
@@ -330,6 +325,8 @@ string stage1(string input)
 		if (readingSymbols) currConstituent += input[i];
 		if (input[i] == '(') readingSymbols = true;
 	}
+	for (int i = 0; i < constituents.getSize(); i++) cout << constituents[i] << endl;
+	cout << endl;
 	StringArray orderMinusOneImplicants;
 	string currImplicant, currLeftConstituent, currRightConstituent;
 	int constituentsArraySize = constituents.getSize();
@@ -346,6 +343,8 @@ string stage1(string input)
 			}
 		}
 	}
+	for (int i = 0; i < orderMinusOneImplicants.getSize(); i++) cout << orderMinusOneImplicants[i] << endl;
+	cout << endl;
 	StringArray orderMinusTwoImplicants;
 	string currLeftImplicant, currRightImplicant;
 	int orderMinusOneImplicantsArraySize = orderMinusOneImplicants.getSize();
@@ -362,8 +361,20 @@ string stage1(string input)
 			}
 		}
 	}
+	for (int i = 0; i < orderMinusTwoImplicants.getSize(); i++) cout << orderMinusTwoImplicants[i] << endl;
+	cout << endl;
 	string result;
-	string connector = (input[5] == '*') ? " + " : " * ";
+	string connector;
+	for (int i = 0; i < size(input) - 2; i++)
+	{
+		if (input[i] == ')')
+		{
+			connector += ' ';
+			connector += input[i + 2];
+			connector += ' ';
+			break;
+		}
+	}
 	int orderMinusTwoImplicantsArraySize = orderMinusTwoImplicants.getSize();
 	for (int currIndex = 0; currIndex < orderMinusTwoImplicantsArraySize; currIndex++)
 	{

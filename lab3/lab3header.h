@@ -9,6 +9,7 @@ private:
 	string* arr;
 	int size = 0;
 public:
+	~StringArray();
 	void push(string pushing);
 	bool has(string searching);
 	int getSize();
