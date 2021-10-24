@@ -391,6 +391,31 @@ string reduceViaCalculatingMethod(string stage1output)
 
 string reduceViaTableCalculatingMethod(string initialInput, string stage1output)
 {
+	StringArray initialInputArr(initialInput);
+	StringArray stage1outputArr(stage1output);
+	int initialInputArrSize = initialInputArr.getSize();
+	int stage1outputArrSize = stage1outputArr.getSize();
+	bool** table = new bool* [stage1outputArrSize];
+	for (int i = 0; i < stage1outputArrSize; i++) table[i] = new bool [initialInputArrSize];
+	string expression, constituent;
+	for (int currExpression = 0; currExpression < stage1outputArrSize; currExpression++)
+	{
+		expression = stage1outputArr[currExpression];
+		for (int currConstituent = 0; currConstituent < initialInputArrSize; currConstituent++)
+		{
+			constituent = initialInputArr[currConstituent];
+			table[currExpression][currConstituent] = aSubfunctionOf(constituent, expression);
+		}
+	}
+	for (int i = 0; i < stage1outputArrSize; i++)
+	{
+		for (int j = 0; j < initialInputArrSize; j++)
+		{
+			if (table[i][j]) printf("1 ");
+			else printf("0 ");
+		}
+		printf("\n");
+	}
 	return "";
 }
 
