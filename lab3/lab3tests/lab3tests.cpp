@@ -112,28 +112,117 @@ namespace lab3tests
 			string actual = concatenateNeighboring("!x1 * !x6 * x3 * !x9 * x4 * !x5 * !x2 * x8 * !x7", "x6 * !x9 * !x1 * x3 * !x5 * x4 * !x2 * !x7 * x8");
 			Assert::IsTrue(areEquivalent(expected, actual));
 		}
+		TEST_METHOD(subfunction1)
+		{
+			Assert::IsTrue(aSubfunctionOf("x1 * x2 * !x3", "x1 * x2"));
+		}
+		TEST_METHOD(subfunction2)
+		{
+			Assert::IsTrue(aSubfunctionOf("!x1 + x2 + !x3 + !x4", "x2 + !x4"));
+		}
+		TEST_METHOD(subfunction3)
+		{
+			Assert::IsTrue(aSubfunctionOf("x1 * !x2 * !x3 * !x4 * x5", "x1"));
+		}
+		TEST_METHOD(subfunction4)
+		{
+			Assert::IsTrue(aSubfunctionOf("x1", "x1"));
+		}
+		TEST_METHOD(subfunction5)
+		{
+			Assert::IsTrue(aSubfunctionOf("x1 * !x2 * !x3 * !x4 * x5", "!x3 * x5 * !x2 * x1 * !x4"));
+		}
+		TEST_METHOD(notsubfunction1)
+		{
+			Assert::IsFalse(aSubfunctionOf("x1 * !x2 * !x3", "x1 * !x2 * x4"));
+		}
+		TEST_METHOD(notsubfunction2)
+		{
+			Assert::IsFalse(aSubfunctionOf("x1 + !x2 + !x3", "!x1"));
+		}
+		TEST_METHOD(notsubfunction3)
+		{
+			Assert::IsFalse(aSubfunctionOf("x1 * !x2 * !x4 * x7", "x1 * !x2 * !x4 * !x7"));
+		}
+		TEST_METHOD(bothSumOrProduct1)
+		{
+			Assert::IsTrue(bothSumOrProduct("x1", "x3 + x2"));
+		}
+		TEST_METHOD(bothSumOrProduct2)
+		{
+			Assert::IsTrue(bothSumOrProduct("x1 * x3 * x7", "x2 * x9"));
+		}
+		TEST_METHOD(bothSumOrProduct3)
+		{
+			Assert::IsTrue(bothSumOrProduct("!x3 + x2 + x5 + !x9 + x1", "x7 + x3 + !x5"));
+		}
+		TEST_METHOD(notBothSumOrProduct1)
+		{
+			Assert::IsFalse(bothSumOrProduct("x1 * x3", "x2 + x8"));
+		}
+		TEST_METHOD(notBothSumOrProduct2)
+		{
+			Assert::IsFalse(bothSumOrProduct("x1 * x3 * x2 * !x9 * !x5", "x8 + x1 + !x2"));
+		}
+		TEST_METHOD(evaluateArbitraryFunction1)
+		{
+			string input = "x1 * x2";
+			BoolArray args;
+			args.push(true);
+			args.push(true);
+			Assert::IsTrue(evaluateFunction(input, args, 0));
+		}
+		TEST_METHOD(evaluateArbitraryFunction2)
+		{
+			string input = "x1 + x2 * !x3";
+			BoolArray args;
+			args.push(false);
+			args.push(true);
+			args.push(true);
+			Assert::IsFalse(evaluateFunction(input, args, 0));
+		}
+		TEST_METHOD(evaluateArbitraryFunction3)
+		{
+			string input = "x1 + x2 + x3 + x4 + x5 + x6 + !x7 + x8";
+			BoolArray args;
+			args.push(false);
+			args.push(false);
+			args.push(false);
+			args.push(false);
+			args.push(false);
+			args.push(false);
+			args.push(true);
+			args.push(false);
+			Assert::IsFalse(evaluateFunction(input, args, 0));
+		}
+		TEST_METHOD(evaluateArbitraryFunction4)
+		{
+			string input = "x1 * !x2 * x3 * !x7 * !x5 * x4";
+			BoolArray args;
+			args.push(true);
+			args.push(false);
+			args.push(true);
+			args.push(false);
+			args.push(false);
+			args.push(true);
+			Assert::IsTrue(evaluateFunction(input, args, 0));
+		}
 		TEST_METHOD(stage1_1)
 		{
-			string expected = "(x1)";
-			string actual = stage1("(x1 * !x2 * x3) + (x1 * x2 * x3) + (x1 * !x2 * !x3) + (x1 * x2 * !x3)");
+			string expected = "(x1 * x3 * x4) + (x1 * x2 * !x4)";
+			string actual = stage1("(x1 * x2 * x3 * x4) + (x1 * !x2 * x3 * x4) + (x1 * x2 * !x3 * !x4) + (x1 * x2 * x3 * !x4)");
 			Assert::AreEqual(expected, actual);
 		}
 		TEST_METHOD(stage1_2)
 		{
-			string expected = "(x1 + !x3)";
-			string actual = stage1("(x1 + x2 + !x3 + x4) * (x1 + x2 + !x3 + !x4) * (x1 + !x2 + !x3 + !x4) * (x1 + !x2 + !x3 + x4)");
+			string expected = "(x1 * x3)";
+			string actual = stage1("(x1 * x2 * x3 * x4) + (x1 * !x2 * x3 * x4) + (x1 * x2 * x3 * !x4) + (x1 * !x2 * x3 * !x4)");
 			Assert::AreEqual(expected, actual);
 		}
 		TEST_METHOD(stage1_3)
 		{
-			string expected = "(x1 * x3) + (x1 * !x4)";
-			string actual = stage1("(x1 * !x2 * x3 * !x4) + (x1 * !x2 * x3 * x4) + (x1 * x2 * x3 * !x4) + (x1 * x2 * x3 * x4) + (!x1 * !x2 * !x3 * !x4) + (x1 * !x2 * !x3 * !x4) + (x1 * x2 * !x3 * !x4)");
-			Assert::AreEqual(expected, actual);
-		}
-		TEST_METHOD(stage1_4)
-		{
-			string expected = "(x2 + x4 + !x5)";
-			string actual = stage1("(x1 + x2 + !x3 + x4 + !x5) * (x1 + x2 + x3 + x4 + !x5) * (x1 + !x2 + !x3 + x4 + !x5) * (x1 + x2 + !x3 + x4 + x5) * (!x1 + x2 + !x3 + x4 + !x5) * (!x1 + x2 + x3 + x4 + !x5)");
+			string expected = "(x1)";
+			string actual = stage1("(x1 * x2 * x3 * x4) + (x1 * !x2 * x3 * x4) + (x1 * x2 * x3 * !x4) + (x1 * !x2 * x3 * !x4) + (x1 * x2 * !x3 * x4) + (x1 * !x2 * !x3 * x4) + (x1 * x2 * !x3 * !x4) + (x1 * !x2 * !x3 * !x4)");
 			Assert::AreEqual(expected, actual);
 		}
 	};

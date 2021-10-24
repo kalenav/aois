@@ -10,6 +10,7 @@ private:
 	int size = 0;
 public:
 	StringArray();
+	StringArray(string input);
 	StringArray(const StringArray& copying);
 	~StringArray();
 	void push(string pushing);
@@ -48,9 +49,9 @@ bool aSubfunctionOf(string function, string subfunction);
 
 bool evaluateFunction(string function, BoolArray args, int currArg);
 
-string reduceViaCalculatingMethod(string input);
+string reduceViaCalculatingMethod(string stage1output);
 
-string reduceViaTableCalculatingMethod(string input);
+string reduceViaTableCalculatingMethod(string initialInput, string stage1output);
 
 string concatenateNeighboring(string left, string right);
 

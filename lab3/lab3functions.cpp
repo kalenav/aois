@@ -6,6 +6,25 @@ StringArray::StringArray()
 
 }
 
+StringArray::StringArray(string input)
+{
+	int expressionQuantity = 0;
+	for (int i = 0; i < input.length(); i++) if (input[i] == '(') expressionQuantity++;
+	string currExpression;
+	bool readingSymbols = false;
+	for (int i = 0; i < input.length(); i++)
+	{
+		if (input[i] == ')')
+		{
+			readingSymbols = false;
+			if (!(*this).has(currExpression)) (*this).push(currExpression);
+			currExpression = "";
+		}
+		if (readingSymbols) currExpression += input[i];
+		if (input[i] == '(') readingSymbols = true;
+	}
+}
+
 StringArray::StringArray(const StringArray& copying)
 {
 	size = copying.size;
@@ -271,7 +290,11 @@ bool aSubfunctionOf(string function, string subfunction)
 
 bool evaluateFunction(string input, BoolArray args, int currArg)
 {
-	if (currArg == args.getSize() - 1) return args[currArg];
+	if (currArg == args.getSize() - 1)
+	{
+		if (input[0] == '!') return !args[currArg];
+		else return args[currArg];
+	}
 	int separatorIndex;
 	for (int i = 0; i < size(input); i++)
 	{
@@ -361,34 +384,19 @@ string concatenateNeighboring(string left, string right)
 	return result;
 }
 
-string reduceViaCalculatingMethod(string input)
+string reduceViaCalculatingMethod(string stage1output)
 {
-	return input;
+	return stage1output;
 }
 
-string reduceViaTableCalculatingMethod(string input)
+string reduceViaTableCalculatingMethod(string initialInput, string stage1output)
 {
-	return input;
+	return "";
 }
 
 string concatenateAllNeighboringIn(string input)
 {
-	int constituentQuantity = 0;
-	for (int i = 0; i < size(input); i++) if (input[i] == '(') constituentQuantity++;
-	StringArray constituents;
-	string currConstituent;
-	bool readingSymbols = false;
-	for (int i = 0; i < size(input); i++)
-	{
-		if (input[i] == ')')
-		{
-			readingSymbols = false;
-			if(!constituents.has(currConstituent)) constituents.push(currConstituent);
-			currConstituent = "";
-		}
-		if (readingSymbols) currConstituent += input[i];
-		if (input[i] == '(') readingSymbols = true;
-	}
+	StringArray constituents(input);
 	StringArray orderMinusOneImplicants;
 	string currImplicant, currLeftConstituent, currRightConstituent;
 	int constituentsArraySize = constituents.getSize();
@@ -447,6 +455,7 @@ string concatenateAllNeighboringIn(string input)
 			connector += ' ';
 			break;
 		}
+		if (i == size(input) - 1) connector = "   ";
 	}
 	string intermediateResult;
 	for (int i = 0; i < constituentsArraySize; i++)
@@ -477,7 +486,8 @@ string concatenateAllNeighboringIn(string input)
 		intermediateResult += connector;
 	}
 	string result;
-	for (int i = 0; i < size(intermediateResult) - 3; i++) result += intermediateResult[i];
+	int intermediateResultSize = size(intermediateResult); // or else the below condition wont work in case the input was an empty string, since size() return an unsigned int, and subtracting something from 0 in unsigned int sends it to 4 billion instead of negatives
+	for (int i = 0; i < intermediateResultSize - 3; i++) result += intermediateResult[i];
 	return result;
 }
 
@@ -499,21 +509,9 @@ string consumeAllIn(string input)
 	do
 	{
 		changeMade = false;
-		StringArray expressions;
+		StringArray expressions(result);
 		StringArray resultArr;
 		string currExpression;
-		bool readingSymbols = false;
-		for (int i = 0; i < size(result); i++)
-		{
-			if (result[i] == ')')
-			{
-				readingSymbols = false;
-				if (!expressions.has(currExpression)) expressions.push(currExpression);
-				currExpression = "";
-			}
-			if (readingSymbols) currExpression += result[i];
-			if (result[i] == '(') readingSymbols = true;
-		}
 		string currLeftExpression, currRightExpression;
 		int expressionsArraySize = expressions.getSize();
 		bool* consumed = new bool [expressionsArraySize];
