@@ -115,6 +115,8 @@ bool isSKNF(string input, int argumentsQuantity)
 {
 	int* variablesInCurrentParenthesesSet = new int [argumentsQuantity];
 	bool insideParentheses = false;
+	bool* argumentsFound = new bool[argumentsQuantity];
+	for (int i = 0; i < argumentsQuantity; i++) argumentsFound[i] = false;
 	for (int i = 0; i < size(input); i++)
 	{
 		if (input[i] == '(')
@@ -122,7 +124,7 @@ bool isSKNF(string input, int argumentsQuantity)
 			for (int j = 0; j < argumentsQuantity; j++) variablesInCurrentParenthesesSet[j] = 0;
 			insideParentheses = true;
 		}
-		if (input[i] != ' ' && input[i] != '!' && input[i] != 'x' && input[i] != '*') variablesInCurrentParenthesesSet[(int)(input[i] - '0') - 1]++;
+		if (insideParentheses && input[i] != ' ' && input[i] != '!' && input[i] != 'x' && input[i] != '*') variablesInCurrentParenthesesSet[(int)(input[i] - '0') - 1]++;
 		if (insideParentheses && input[i] == '*') return false;
 		if (input[i] == ')')
 		{
@@ -130,7 +132,9 @@ bool isSKNF(string input, int argumentsQuantity)
 			for (int j = 0; j < argumentsQuantity; j++) if (variablesInCurrentParenthesesSet[j] != 1) return false;
 			insideParentheses = false;
 		}
+		if (input[i] == 'x') argumentsFound[(int)(input[i + 1]) - '0' - 1] = true;
 	}
+	for (int i = 0; i < argumentsQuantity; i++) if (argumentsFound[i] != true) return false;
 	return true;
 }
 
@@ -138,6 +142,8 @@ bool isSDNF(string input, int argumentsQuantity)
 {
 	int* variablesInCurrentParenthesesSet = new int[argumentsQuantity];
 	bool insideParentheses = false;
+	bool* argumentsFound = new bool[argumentsQuantity];
+	for (int i = 0; i < argumentsQuantity; i++) argumentsFound[i] = false;
 	for (int i = 0; i < size(input); i++)
 	{
 		if (input[i] == '(')
@@ -145,7 +151,7 @@ bool isSDNF(string input, int argumentsQuantity)
 			for (int j = 0; j < argumentsQuantity; j++) variablesInCurrentParenthesesSet[j] = 0;
 			insideParentheses = true;
 		}
-		if (input[i] != ' ' && input[i] != '!' && input[i] != 'x' && input[i] != '+') variablesInCurrentParenthesesSet[(int)(input[i] - '0') - 1]++;
+		if (insideParentheses && input[i] != ' ' && input[i] != '!' && input[i] != 'x' && input[i] != '+') variablesInCurrentParenthesesSet[(int)(input[i] - '0') - 1]++;
 		if (insideParentheses && input[i] == '+') return false;
 		if (input[i] == ')')
 		{
@@ -153,7 +159,9 @@ bool isSDNF(string input, int argumentsQuantity)
 			for (int j = 0; j < argumentsQuantity; j++) if (variablesInCurrentParenthesesSet[j] != 1) return false;
 			insideParentheses = false;
 		}
+		if (input[i] == 'x') argumentsFound[(int)(input[i+1]) - '0' - 1] = true;
 	}
+	for (int i = 0; i < argumentsQuantity; i++) if (argumentsFound[i] != true) return false;
 	return true;
 }
 
