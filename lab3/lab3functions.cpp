@@ -1,4 +1,5 @@
 #include "lab3header.h"
+#include "../lab2/lab2header.h"
 #include <string>
 
 StringArray::StringArray()
@@ -321,17 +322,17 @@ bool evaluateFunction(string input, BoolArray args)
 		if (input[i] == '(') implicants++;
 		if (input[i] == ')' && !separatorIndexSet)
 		{
-			separatorIndex = input[i + 2];
+			separatorIndex = i + 2;
 			separatorIndexSet = true;
 		}
 	}
-	if (implicants == 1) return evaluateImplicant(input, args);
+	if (implicants == 1) return evaluateImplicant(clearParentheses(input), args);
 	string leftSide;
 	for (int i = 0; i < separatorIndex - 1; i++) leftSide += input[i];
 	string rightSide;
 	for (int i = separatorIndex + 2; i < size(input); i++) rightSide += input[i];
 	if (input[separatorIndex] == '+') return evaluateImplicant(leftSide, args) || evaluateFunction(rightSide, args);
-	else return evaluateImplicant(leftSide, args) && evaluateFunction(rightSide, args);
+	else return evaluateImplicant(clearParentheses(leftSide), args) && evaluateFunction(rightSide, args);
 }
 
 string concatenateNeighboring(string left, string right)
