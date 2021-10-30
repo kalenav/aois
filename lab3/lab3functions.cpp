@@ -296,27 +296,42 @@ bool aSubfunctionOf(string function, string subfunction)
 	return true;
 }
 
-bool evaluateFunction(string input, BoolArray args, int currArg)
+bool evaluateImplicant(string input, BoolArray args)
 {
-	if (currArg == args.getSize() - 1)
+	if (size(input) <= 3)
 	{
-		if (input[0] == '!') return !args[currArg];
-		else return args[currArg];
+		if (input[0] == '!') return !args[(int)(input[2] - '0') - 1];
+		else return args[(int)(input[1] - '0') - 1];
 	}
+	int separatorIndex = (input[0] == '!') ? 4 : 3;
+	bool leftSide = (input[0] == '!') ? !args[(int)(input[2] - '0') - 1] : args[(int)(input[1] - '0') - 1];
+	string rightSide;
+	for (int i = separatorIndex + 2; i < size(input); i++) rightSide += input[i];
+	if (input[separatorIndex] == '+') return leftSide || evaluateImplicant(rightSide, args);
+	else return leftSide && evaluateImplicant(rightSide, args);
+}
+
+bool evaluateFunction(string input, BoolArray args)
+{
+	int implicants = 0;
 	int separatorIndex;
+	bool separatorIndexSet = false;
 	for (int i = 0; i < size(input); i++)
 	{
-		if (input[i] == ' ')
+		if (input[i] == '(') implicants++;
+		if (input[i] == ')' && !separatorIndexSet)
 		{
-			separatorIndex = i + 1;
-			break;
+			separatorIndex = input[i + 2];
+			separatorIndexSet = true;
 		}
 	}
+	if (implicants == 1) return evaluateImplicant(input, args);
+	string leftSide;
+	for (int i = 0; i < separatorIndex - 1; i++) leftSide += input[i];
 	string rightSide;
-	bool leftSide = (input[0] == '!') ? !args[currArg] : args[currArg];
 	for (int i = separatorIndex + 2; i < size(input); i++) rightSide += input[i];
-	if (input[separatorIndex] == '+') return leftSide || evaluateFunction(rightSide, args, currArg + 1);
-	else return leftSide && evaluateFunction(rightSide, args, currArg + 1);
+	if (input[separatorIndex] == '+') return evaluateImplicant(leftSide, args) || evaluateFunction(rightSide, args);
+	else return evaluateImplicant(leftSide, args) && evaluateFunction(rightSide, args);
 }
 
 string concatenateNeighboring(string left, string right)

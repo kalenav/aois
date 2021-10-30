@@ -47,7 +47,9 @@ bool areEquivalent(string left, string right);
 
 bool aSubfunctionOf(string function, string subfunction);
 
-bool evaluateFunction(string function, BoolArray args, int currArg);
+bool evaluateImplicant(string implicant, BoolArray args);
+
+bool evaluateFunction(string function, BoolArray args);
 
 bool redundantRow(bool** table, int tableHeight, int tableWidth, int row, bool* ignoredRows);
 
