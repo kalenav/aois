@@ -49,6 +49,8 @@ bool aSubfunctionOf(string function, string subfunction);
 
 bool evaluateFunction(string function, BoolArray args, int currArg);
 
+bool redundantRow(bool** table, int tableHeight, int tableWidth, int row, bool* ignoredRows);
+
 string reduceViaCalculatingMethod(string stage1output);
 
 string reduceViaTableCalculatingMethod(string initialInput, string stage1output);

@@ -41,7 +41,7 @@ int main()
 		break;
 	}
 	printf("\nIt appears that the minimized form of your function is ");
-	cout << stage1(function);
+	cout << reduceViaTableCalculatingMethod(function, stage1(function));
 	printf(".\n\n");
 	return 0;
 }

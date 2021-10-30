@@ -415,7 +415,7 @@ string reduceViaTableCalculatingMethod(string initialInput, string stage1output)
 			table[currExpression][currConstituent] = aSubfunctionOf(constituent, expression);
 		}
 	}
-	for (int i = 0; i < stage1outputArrSize; i++)
+	/*for (int i = 0; i < stage1outputArrSize; i++)
 	{
 		for (int j = 0; j < initialInputArrSize; j++)
 		{
@@ -424,7 +424,68 @@ string reduceViaTableCalculatingMethod(string initialInput, string stage1output)
 		}
 		printf("\n");
 	}
-	return "";
+	printf("\n");*/
+	bool* ignoredRows = new bool [stage1outputArrSize];
+	for (int i = 0; i < stage1outputArrSize; i++) ignoredRows[i] = false;
+	for (int i = 0; i < stage1outputArrSize; i++)
+	{
+		if (redundantRow(table, stage1outputArrSize, initialInputArrSize, i, ignoredRows)) ignoredRows[i] = true;
+	}
+	string result;
+	string connector;
+	for (int i = 0; i < size(initialInputArr[0]); i++)
+	{
+		if (initialInputArr[0][i] == ' ')
+		{
+			connector += ' ';
+			connector += (initialInputArr[0][i + 1] == '*') ? '+' : '*';
+			connector += ' ';
+			break;
+		}
+	}
+	bool firstImplicant = false;
+	for (int i = 0; i < stage1outputArrSize; i++)
+	{
+		if (!ignoredRows[i])
+		{
+			if (!firstImplicant) firstImplicant = true;
+			else result += connector;
+			result += '(';
+			result += stage1outputArr[i];
+			result += ')';
+		}
+	}
+	return result;
+}
+
+bool redundantRow(bool** table, int tableHeight, int tableWidth, int row, bool* ignoredRows)
+{
+	bool** tableCut = new bool* [tableHeight - 1];
+	for (int i = 0; i < tableHeight - 1; i++) tableCut[i] = new bool[tableWidth];
+	int offset = 0;
+	for (int i = 0; i < tableHeight - 1; i++)
+	{
+		if (i == row) offset = 1;
+		for (int j = 0; j < tableWidth; j++)
+		{
+			tableCut[i][j] = table[i + offset][j];
+			//if (tableCut[i][j]) printf("1 ");
+			//else printf("0 ");
+		}
+		//printf("\n");
+	}
+	bool trueInCurrentColumn;
+	for (int j = 0; j < tableWidth; j++)
+	{
+		trueInCurrentColumn = false;
+		for (int i = 0; i < tableHeight - 1; i++)
+		{
+			if (ignoredRows[i]) continue;
+			if (tableCut[i][j]) trueInCurrentColumn = true;
+		}
+		if (!trueInCurrentColumn) return false;
+	}
+	return true;
 }
 
 string concatenateAllNeighboringIn(string input)
@@ -437,11 +498,9 @@ string concatenateAllNeighboringIn(string input)
 	for (int i = 0; i < constituentsArraySize; i++) usedConstituents[i] = false;
 	for (int leftIndex = 0; leftIndex < constituentsArraySize; leftIndex++)
 	{
-		if (usedConstituents[leftIndex]) continue;
 		currLeftConstituent = constituents[leftIndex];
 		for (int rightIndex = leftIndex + 1; rightIndex < constituentsArraySize; rightIndex++)
 		{
-			if (usedConstituents[rightIndex]) continue;
 			currRightConstituent = constituents[rightIndex];
 			if (areNeighboring(currLeftConstituent, currRightConstituent))
 			{
@@ -449,7 +508,6 @@ string concatenateAllNeighboringIn(string input)
 				usedConstituents[rightIndex] = true;
 				currImplicant = concatenateNeighboring(currLeftConstituent, currRightConstituent);
 				if (!orderMinusOneImplicants.has(currImplicant)) orderMinusOneImplicants.push(currImplicant);
-				break;
 			}
 		}
 	}
@@ -460,11 +518,9 @@ string concatenateAllNeighboringIn(string input)
 	for (int i = 0; i < orderMinusOneImplicantsArraySize; i++) usedOrderMinusOneImplicants[i] = false;
 	for (int leftIndex = 0; leftIndex < orderMinusOneImplicantsArraySize; leftIndex++)
 	{
-		if (usedOrderMinusOneImplicants[leftIndex]) continue;
 		currLeftImplicant = orderMinusOneImplicants[leftIndex];
 		for (int rightIndex = leftIndex + 1; rightIndex < orderMinusOneImplicantsArraySize; rightIndex++)
 		{
-			if (usedOrderMinusOneImplicants[rightIndex]) continue;
 			currRightImplicant = orderMinusOneImplicants[rightIndex];
 			if (areNeighboring(currLeftImplicant, currRightImplicant))
 			{
@@ -537,7 +593,7 @@ string consumeAllIn(string input)
 			break;
 		}
 	}
-	bool changeMade = false;
+	bool changeMade;
 	string result = input;
 	do
 	{
