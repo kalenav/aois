@@ -115,7 +115,8 @@ function isSDNF(input, argumentsQuantity)
 
 function checkInputCorrectness(input)
 {
-  return isSDNF(input) || isSKNF(input);
+  var argumentQuantity = input.split('').reduce((r, v) => { if(!isNaN(v) && Number(v) > r) return Number(v); else return r }, 0);
+  return isSDNF(input, argumentQuantity) || isSKNF(input, argumentQuantity);
 }
 
 function bothSumOrProduct(leftImplicant, rightImplicant)
@@ -334,8 +335,8 @@ function getRequiredArgumentValues(implicant)
   {  
     if(v == 'x')
     {
-      if(disjunctiveImplicant) argumentValues[a[i + 1]] = (a[i - 1] != '!')
-      else argumentValues[a[i + 1]] = (a[i - 1] == '!')
+      if(disjunctiveImplicant) argumentValues[a[i + 1]] = (a[i - 1] == '!')
+      else argumentValues[a[i + 1]] = (a[i - 1] != '!')
     }
   })
   return argumentValues;
@@ -391,6 +392,26 @@ function evaluateWithReplacedValues(input)
       else a[i] = '0';
     }
   })
+  for(let i = 0; i < implicantArray.length; i++)
+  {
+    var currLeft = implicantArray[i];
+    for(let j = i + 1; j < implicantArray.length; j++)
+    {
+      var currRight = implicantArray[j];
+      if(implicantArray[i].indexOf('x') != -1 && implicantArray[j].indexOf('x') != -1)
+      {
+        var currLeftLength = currLeft.length;
+        var currRightLength = currRight.length;
+        if(Math.abs(currLeftLength - currRightLength) == 1 && (currLeft[currLeftLength - 1] == currRight[currRightLength - 1]))
+        {
+          var newArray = implicantArray.filter((v, ind) => (ind != i && ind != j));
+          if(implicantConnector == ' + ') newArray.push('1');
+          else newArray.push('0');
+          implicantArray = newArray;
+        }
+      }
+    }
+  }
   input = implicantArray.join(implicantConnector);
   if(implicantConnector == ' + ')
   {
@@ -422,19 +443,12 @@ function checkImplicantImportance(func, implicant)
 
 function reduceViaCalculatingMethod(input)
 {
+  debugger;
   if(checkInputCorrectness(input) == false) return "Incorrect input";
   var stage1output = stage1(input);
   var implicantConnector = ' ' + input[input.indexOf(')') + 2] + ' ';
   var implicantArray = stage1output.split(implicantConnector);
-  var resultStr = "";
-  implicantArray.forEach((v, i) => 
-  {
-    if(checkImplicantImportance(stage1output, v) == true)
-    {
-      resultStr += v + implicantConnector;
-    }
-  })
-  return resultStr.slice(0, resultStr.length - 3);
+  return implicantArray.filter((currImplicant) => checkImplicantImportance(stage1output.split(implicantConnector).filter(v => v != currImplicant).join(implicantConnector), currImplicant)).join(implicantConnector);
 }
 
 function redundantRow(matrix, rowIndex, ignoredRows)
