@@ -443,12 +443,18 @@ function checkImplicantImportance(func, implicant)
 
 function reduceViaCalculatingMethod(input)
 {
-  debugger;
   if(checkInputCorrectness(input) == false) return "Incorrect input";
   var stage1output = stage1(input);
   var implicantConnector = ' ' + input[input.indexOf(')') + 2] + ' ';
   var implicantArray = stage1output.split(implicantConnector);
-  return implicantArray.filter((currImplicant) => checkImplicantImportance(stage1output.split(implicantConnector).filter(v => v != currImplicant).join(implicantConnector), currImplicant)).join(implicantConnector);
+  if(implicantArray.length == 1) return stage1output;
+  var redundantImplicants = new Array(implicantArray.length).fill(false);
+  for(let i = 0; i < implicantArray.length; i++)
+  {
+    if(redundantImplicants.filter(v => v == true).length == implicantArray.length - 1) break;
+    redundantImplicants[i] = !checkImplicantImportance(implicantArray.filter(v => v != implicantArray[i]).join(implicantConnector), implicantArray[i]);
+  }
+  return implicantArray.filter((v, i) => redundantImplicants[i] == false).join(implicantConnector);
 }
 
 function redundantRow(matrix, rowIndex, ignoredRows)
@@ -673,7 +679,7 @@ function findBestGroupCoverage(map)
     if(coverages[i].length == 0) continue;
     currBestCoverageCoefficient = coverages[i].reduce(((r, v, ind) => 
     {
-      var currCoefficient = calcCoverageCoefficient(v, map[0].length, map.length);
+      var currCoefficient = calcCoverageCoefficient(v, map);
       if(r < currCoefficient)
       {
         currBestCoverageIndex = ind;
@@ -749,11 +755,24 @@ function coversAllOnes(map, groups)
   return true;
 }
 
-function calcCoverageCoefficient(groups, mapWidth, mapHeight)
+function onesInMap(map)
+{
+  var quantity = 0;
+  for(let i = 0; i < map.length; i++)
+  {
+    for(let j = 0; j < map[0].length; j++)
+    {
+      if(map[i][j] == 1) quantity++;
+    }
+  }
+  return quantity;
+}
+
+function calcCoverageCoefficient(groups, map)
 {
   if(groups.length == 0) return 0;
-  var combinedGroupSize = groups.reduce(((r, v) => r += calcGroupSize(v, mapWidth, mapHeight)), 0);
-  return combinedGroupSize / groups.length;
+  var combinedGroupSize = groups.reduce(((r, v) => r += calcGroupSize(v, map[0].length, map.length)), 0);
+  return onesInMap(map) / (groups.length * combinedGroupSize);
 }
 
 function calcGroupSize(group, mapWidth, mapHeight)
@@ -830,3 +849,77 @@ function reduceViaTableMethod(input)
   }
   return stage1(result.slice(0, result.length - 3));
 }
+
+function readlinePromise(message)
+{
+  return new Promise((resolve, reject) => 
+  {
+    var readline = require('readline').createInterface({
+      input: process.stdin,
+      output: process.stdout
+    });
+    readline.question(message, input =>
+    {
+      readline.close();
+      resolve(input);
+    });
+  });
+}
+
+async function lab3()
+{          
+  var argumentQuantity = 0;
+  var firstIteration = true;
+  do
+  {
+    if(!firstIteration) console.log("Incorrect input. ")
+    argumentQuantity = Number(await readlinePromise("Input argument quantity: "));
+    firstIteration = false;
+  }
+  while(isNaN(argumentQuantity) || argumentQuantity % 1 != 0 || argumentQuantity < 1);
+
+  var func = "";
+  firstIteration = true;
+  do
+  {
+    if(!firstIteration) console.log("Incorrect input. ")
+    func = await readlinePromise("Input the function to minimize: ");
+    firstIteration = false;
+  }
+  while(!isSDNF(func, argumentQuantity) && !isSKNF(func, argumentQuantity));
+
+  var method = 0;
+  firstIteration = true;
+  do
+  {
+    if(!firstIteration) console.log("Incorrect input. ")
+    method = Number(await readlinePromise("Choose minimization method: 1 - calculating, 2 - table-calculating, 3 - table: "));
+    firstIteration = false;
+  }
+  while(isNaN(method) || method % 1 != 0 || method < 1 || method > 3);
+
+  switch(method)
+  {
+  case 1:
+  {
+    console.log(reduceViaCalculatingMethod(func));
+    break;
+  }
+  case 2:
+  { 
+    console.log(reduceViaTableCalculatingMethod(func));
+    break;
+  }
+  case 3:
+  {
+    console.log(reduceViaTableMethod(func));
+    break;
+  }
+  default:
+  {
+    console.log("Something went wrong!");
+  }
+  }
+}
+
+lab3();
