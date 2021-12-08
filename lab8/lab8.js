@@ -7,27 +7,37 @@ function new_associative_matrix()
   return matrix;
 }
 
+function copy_matrix(matrix)
+{
+  var copy = new Array(matrix.length);
+  for(let i = 0; i < matrix.length; i++) copy[i] = new Array(matrix[0].length);
+  for(let i = 0; i < matrix.length; i++) for(let j = 0; j < matrix[0].length; j++) copy[i][j] = matrix[i][j];
+  return copy;
+}
+
+function shift_existing_entries_left(matrix)
+{
+  var copy = copy_matrix(matrix);
+  for(let i = 0; i < matrix.length; i++)
+  {
+    for(let j = 0; j < matrix[0].length; j++)
+    {
+      matrix[i][(j + matrix_size - 1) % matrix_size] = copy[i][j];
+    }
+  }
+  return matrix;
+}
+
 function add_entry(matrix, entry)
 {
   if(!(entry instanceof Array) || entry.some(v => typeof(v) != 'boolean') || entry.length != matrix_size) return false;
+  if(!(matrix[0]).some(v => v == -1)) return false;
+  shift_existing_entries_left(matrix);
   for(let i = 0; i < matrix_size; i++)
   {
-    if(matrix[i][0] == -1)
-    {
-      debugger;
-      var row = i;
-      var column = 0;
-      do
-      {
-        matrix[row][column] = Number(entry[column]);
-        row = (row + 1) % matrix_size;
-        column++;
-      }
-      while(row != i)
-      return true;
-    }
+    matrix[i][i] = Number(entry[i]);
   }
-  return false;
+  return true;
 }
 
 function matrix_to_buffer(matrix)
